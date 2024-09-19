@@ -4,7 +4,7 @@ Title: What the Package Does (One Line, Title Case)
 Version: 0.0.1
 Date: 2024-09-19
 Author: Jakob Goldmann
-Maintainer: Jakob Goldmann <EMAIL TO FOLLOW>
+Maintainer: Jakob Goldmann <a@b.cd>
 Description: More about what the package does (maybe more than one line).
 License: What license it uses
 Imports: 
