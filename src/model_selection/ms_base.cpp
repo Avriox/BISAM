@@ -1,4 +1,4 @@
-#include "model_selection/ms_base.h"
+#include "./ms_base.h"
 #include "mombf/modselIntegrals.h"
 
 msPriorSpec::msPriorSpec(std::string priorType, std::string priorDistr, std::map<std::string, double> priorPars)
