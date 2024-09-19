@@ -1,0 +1,47 @@
+name: R Package Compilation and Function Check
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up R
+      uses: r-lib/actions/setup-r@v2
+      with:
+        r-version: 'release'
+
+    - name: Install dependencies
+      run: |
+        install.packages(c("remotes", "rcmdcheck", "Rcpp", "RcppEigen"))
+        remotes::install_deps(dependencies = TRUE)
+      shell: Rscript {0}
+
+    - name: Check package
+      run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
+      shell: Rscript {0}
+
+    - name: Install package
+      run: R CMD INSTALL .
+
+    - name: Test b_ism function
+      run: |
+        library(BISAM)
+        tryCatch(
+          {
+            # Attempt to call the function with dummy data
+            # Adjust the following line according to your function's actual parameters
+            result <- b_ism(matrix(rnorm(100), 10, 10), rnorm(10))
+            cat("b_ism function is available and executable.\n")
+          },
+          error = function(e) {
+            cat("Error: b_ism function is not available or threw an error.\n")
+            cat("Error message:", conditionMessage(e), "\n")
+            quit(status = 1)
+          }
+        )
+      shell: Rscript {0}
