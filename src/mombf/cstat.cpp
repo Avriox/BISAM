@@ -6,7 +6,6 @@
  Edits: P. Roebuck
 ***********************************************************/
 
-#include <iomanip>
 #include <iostream>
 #include "cstat.h"
 
@@ -445,6 +444,13 @@ double quadratic_xtAselx(const double *x,
         }
     }
     return (z);
+}
+
+// Implementation of quadratic_xtAselx using Eigen
+double quadratic_xtAselx_eigen(const Eigen::VectorXd &x, const Eigen::MatrixXd &A, const Eigen::VectorXi &sel) {
+    Eigen::VectorXd x_sel = x;
+    Eigen::MatrixXd A_sel = A(sel, sel);
+    return x_sel.transpose() * A_sel * x_sel;
 }
 
 
@@ -1168,6 +1174,35 @@ double dmvtC(const double *y,
         return (exp(normk) * pow(1.0 + res / (nu + 0.0), -t1));
 }
 
+double dmvtC_eigen(const Eigen::VectorXd &y,
+                   const Eigen::VectorXd &mu,
+                   const Eigen::MatrixXd &cholsinv,
+                   double det,
+                   int nu,
+                   bool logscale) {
+    int n = y.size();
+    double res;
+
+    // Calculate (y-mu)' * cholsinv' * cholsinv * (y-mu)
+    Eigen::VectorXd z = y - mu;
+    Eigen::VectorXd z2 = cholsinv * z;
+    res = z2.squaredNorm();
+
+    double t2 = 0.5 * nu;
+    double t1 = t2 + 0.5 * n;
+
+    // Using our custom gamln function
+    double normk = gamln(&t1) -
+                   gamln(&t2) -
+                   0.5 * n * (std::log(nu) + std::log(M_PI)) +
+                   0.5 * std::log(det);
+
+    if (logscale) {
+        return normk - t1 * std::log(1 + res / nu);
+    } else {
+        return std::exp(normk) * std::pow(1.0 + res / nu, -t1);
+    }
+}
 
 // * Draw from multivar T with n dimensions and nu degrees of freedom
 // * Result is stored in y[1..n].
@@ -1209,6 +1244,12 @@ void rmvtC(double *y,
     free_dvector(z, 1, n);
 }
 
+void rmvtC_eigen(Eigen::VectorXd &y, const Eigen::VectorXd &mu, const Eigen::MatrixXd &chols, int nu) {
+    int n = mu.size();
+    double x = std::sqrt(nu / gengam(0.5, nu / 2.0));
+    Eigen::VectorXd z = Eigen::VectorXd::NullaryExpr(n, [&]() { return x * rnormC(0, 1); });
+    y = mu + chols * z;
+}
 
 //Univariate iMOM prior
 double dimom(double y, double m, double tau, double phi, int logscale) {

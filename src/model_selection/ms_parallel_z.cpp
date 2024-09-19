@@ -3,9 +3,6 @@
 //
 
 #include "ms_parallel_z.h"
-#include <omp.h>
-#include <iostream>
-#include <thread>
 
 
 // Worker function for thread pool

@@ -8,15 +8,9 @@
 
 
 //Include other headers
-#include "cstat.h"
-#include "crossprodmat.h"
-#include "modelSel_regression.h"
-#include "modselIntegrals.h"
-#include "Polynomial.h"
 
-#include <csignal>
-#include <map>
-#include <string>
+#include "modelSel_regression.h"
+
 
 //Global variables defined for minimization/integration routines
 struct marginalPars f2opt_pars;
@@ -192,6 +186,25 @@ double fimomNegC_non0(double *th, crossprodmat *XtX, double *ytX, double *phi, d
     return ans;
 }
 
+double fimomNegC_non0_eigen(const Eigen::VectorXd &th, const Eigen::MatrixXd &XtX, const Eigen::VectorXd &ytX,
+                            double phi, double tau, int n, int p, const Eigen::VectorXi &sel) {
+    int nsel = sel.size();
+
+    // Calculate ytXth using Eigen operations
+    double ytXth = (ytX(sel).array() * th.array()).sum();
+
+    // Calculate sumlogth and suminvth
+    double sumlogth = (th.array().square().log()).sum();
+    double suminvth = (th.array().square().inverse()).sum();
+
+    // Calculate the quadratic form
+    double quadratic = quadratic_xtAselx_eigen(th, XtX, sel);
+
+    // Calculate the final result
+    double ans = 0.5 * (quadratic - 2 * ytXth) / phi + tau * phi * suminvth + sumlogth;
+
+    return ans;
+}
 
 //Hessian of fimomNegC
 // - ans: hessian matrix evaluated at th (indexed at 1, i.e. ans[1:(*nsel)][1:(*nsel)])
@@ -332,8 +345,10 @@ double pimomMarginalKC(int *sel, int *nsel, struct marginalPars *pars) {
         if (((*(*pars).method) == 0) || ((*(*pars).method) == 2)) {
             ans = k + ILaplace;
         } else {
-            ans = k + IS_imom(thopt, Voptinv, sel, nsel, (*pars).n, (*pars).p, (*pars).XtX, (*pars).ytX, (*pars).phi,
-                              (*pars).tau, (*pars).B);
+//            ans = k + IS_imom(thopt, Voptinv, sel, nsel, (*pars).n, (*pars).p, (*pars).XtX, (*pars).ytX, (*pars).phi,
+//                              (*pars).tau, (*pars).B);
+
+
         }
     }
     if ((*(*pars).logscale) != 1) { ans = exp(ans); }
@@ -344,58 +359,58 @@ double pimomMarginalKC(int *sel, int *nsel, struct marginalPars *pars) {
 
 
 //Evaluation of iMOM integral via Importance Sampling (result is returned in log-scale)
-double IS_imom(double *thopt, double **Voptinv, int *sel, int *nsel, int *n, int *p, crossprodmat *XtX, double *ytX,
-               double *phi, double *tau, int *B) {
-    bool posdef;
-    int i, j;
-    double *sdprop, **Vprop, *sopt, **cholVprop, **cholVpropinv, detVpropinv, *mprop, *thsim, *logr, maxlogr, ans;
-
-    sdprop = dvector(1, *nsel);
-    sopt = dvector(1, *nsel);
-    mprop = dvector(1, *nsel);
-    thsim = dvector(1, *nsel);
-    logr = dvector(0, 999);
-    Vprop = dmatrix(1, *nsel, 1, *nsel);
-    cholVprop = dmatrix(1, *nsel, 1, *nsel);
-    cholVpropinv = dmatrix(1, *nsel, 1, *nsel);
-
-    for (i = 1; i <= (*nsel); i++) {
-        mprop[i] = 0;
-        sopt[i] = sqrt(Voptinv[i][i]);
-        sdprop[i] = .5 * fabs(thopt[i] + 2 * dsign(thopt[i]) * sopt[i]);
-    }
-    for (i = 1; i <= (*nsel); i++) {
-        for (j = i; j <= (*nsel); j++) {
-            Vprop[i][j] = Vprop[j][i] = sdprop[i] * sdprop[j] * Voptinv[i][j] / (sopt[i] * sopt[j]);
-        }
-    }
-    choldc(Vprop, *nsel, cholVprop, &posdef);
-    choldc_inv(Vprop, *nsel, cholVpropinv, &posdef);
-    detVpropinv = choldc_det(cholVpropinv, *nsel);
-    rmvtC(thsim, *nsel, mprop, cholVprop, 1);
-    maxlogr = logr[0] = -fimomNegC_non0(thsim + 1, XtX, ytX, phi, tau, n, p, sel, nsel) -
-                        dmvtC(thsim, *nsel, mprop, cholVpropinv, detVpropinv, 1, 1);
-    for (i = 1; i < 1000; i++) {
-        rmvtC(thsim, *nsel, mprop, cholVprop, 1);
-        logr[i] = -fimomNegC_non0(thsim + 1, XtX, ytX, phi, tau, n, p, sel, nsel) -
-                  dmvtC(thsim, *nsel, mprop, cholVpropinv, detVpropinv, 1, 1);
-        if (logr[i] > maxlogr) { maxlogr = logr[i]; }
-    }
-    for (i = 0, ans = 0; i < 1000; i++) { ans += exp(logr[i] - maxlogr + 500); }
-    for (i = 1000; i < (*B); i++) {
-        rmvtC(thsim, *nsel, mprop, cholVprop, 1);
-        ans += exp(-fimomNegC_non0(thsim + 1, XtX, ytX, phi, tau, n, p, sel, nsel) -
-                   dmvtC(thsim, *nsel, mprop, cholVpropinv, detVpropinv, 1, 1) - maxlogr + 500);
-    }
-    ans = log(ans / (.0 + (*B))) + maxlogr - 500;
-
-    free_dvector(sdprop, 1, *nsel);
-    free_dvector(sopt, 1, *nsel);
-    free_dvector(mprop, 1, *nsel);
-    free_dvector(thsim, 1, *nsel);
-    free_dvector(logr, 0, 999);
-    free_dmatrix(Vprop, 1, *nsel, 1, *nsel);
-    free_dmatrix(cholVprop, 1, *nsel, 1, *nsel);
-    free_dmatrix(cholVpropinv, 1, *nsel, 1, *nsel);
-    return (ans);
-}
+//double IS_imom(double *thopt, double **Voptinv, int *sel, int *nsel, int *n, int *p, crossprodmat *XtX, double *ytX,
+//               double *phi, double *tau, int *B) {
+//    bool posdef;
+//    int i, j;
+//    double *sdprop, **Vprop, *sopt, **cholVprop, **cholVpropinv, detVpropinv, *mprop, *thsim, *logr, maxlogr, ans;
+//
+//    sdprop = dvector(1, *nsel);
+//    sopt = dvector(1, *nsel);
+//    mprop = dvector(1, *nsel);
+//    thsim = dvector(1, *nsel);
+//    logr = dvector(0, 999);
+//    Vprop = dmatrix(1, *nsel, 1, *nsel);
+//    cholVprop = dmatrix(1, *nsel, 1, *nsel);
+//    cholVpropinv = dmatrix(1, *nsel, 1, *nsel);
+//
+//    for (i = 1; i <= (*nsel); i++) {
+//        mprop[i] = 0;
+//        sopt[i] = sqrt(Voptinv[i][i]);
+//        sdprop[i] = .5 * fabs(thopt[i] + 2 * dsign(thopt[i]) * sopt[i]);
+//    }
+//    for (i = 1; i <= (*nsel); i++) {
+//        for (j = i; j <= (*nsel); j++) {
+//            Vprop[i][j] = Vprop[j][i] = sdprop[i] * sdprop[j] * Voptinv[i][j] / (sopt[i] * sopt[j]);
+//        }
+//    }
+//    choldc(Vprop, *nsel, cholVprop, &posdef);
+//    choldc_inv(Vprop, *nsel, cholVpropinv, &posdef);
+//    detVpropinv = choldc_det(cholVpropinv, *nsel);
+//    rmvtC(thsim, *nsel, mprop, cholVprop, 1);
+//    maxlogr = logr[0] = -fimomNegC_non0(thsim + 1, XtX, ytX, phi, tau, n, p, sel, nsel) -
+//                        dmvtC(thsim, *nsel, mprop, cholVpropinv, detVpropinv, 1, 1);
+//    for (i = 1; i < 1000; i++) {
+//        rmvtC(thsim, *nsel, mprop, cholVprop, 1);
+//        logr[i] = -fimomNegC_non0(thsim + 1, XtX, ytX, phi, tau, n, p, sel, nsel) -
+//                  dmvtC(thsim, *nsel, mprop, cholVpropinv, detVpropinv, 1, 1);
+//        if (logr[i] > maxlogr) { maxlogr = logr[i]; }
+//    }
+//    for (i = 0, ans = 0; i < 1000; i++) { ans += exp(logr[i] - maxlogr + 500); }
+//    for (i = 1000; i < (*B); i++) {
+//        rmvtC(thsim, *nsel, mprop, cholVprop, 1);
+//        ans += exp(-fimomNegC_non0(thsim + 1, XtX, ytX, phi, tau, n, p, sel, nsel) -
+//                   dmvtC(thsim, *nsel, mprop, cholVpropinv, detVpropinv, 1, 1) - maxlogr + 500);
+//    }
+//    ans = log(ans / (.0 + (*B))) + maxlogr - 500;
+//
+//    free_dvector(sdprop, 1, *nsel);
+//    free_dvector(sopt, 1, *nsel);
+//    free_dvector(mprop, 1, *nsel);
+//    free_dvector(thsim, 1, *nsel);
+//    free_dvector(logr, 0, 999);
+//    free_dmatrix(Vprop, 1, *nsel, 1, *nsel);
+//    free_dmatrix(cholVprop, 1, *nsel, 1, *nsel);
+//    free_dmatrix(cholVpropinv, 1, *nsel, 1, *nsel);
+//    return (ans);
+//}

@@ -5,15 +5,26 @@
 #ifndef CPP_MS_PARALLEL_Z_H
 #define CPP_MS_PARALLEL_Z_H
 
+// Local includes
 #include "ms_base.h"
-#include "../mombf/modselIntegrals.h"
 #include "ms_no_optimization.h"
 #include "ms_split_z.h"
+#include "../mombf/modselIntegrals.h"
 #include "../SafeQueue.h"
+
+// Standard library includes
 #include <thread>
 #include <atomic>
 #include <condition_variable>
 #include <future>
+
+// If you need any R-specific functionality, you can use:
+#ifdef RCPP_EIGEN
+// R-specific includes or declarations here
+  // For example:
+  // #include <Rcpp.h>
+#endif
+
 
 #define NUM_THREADS 16
 

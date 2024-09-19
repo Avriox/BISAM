@@ -5,9 +5,18 @@
 #ifndef CPP_MS_BASE_H
 #define CPP_MS_BASE_H
 
+#ifdef RCPP_EIGEN
+// R environment
+#include <RcppEigen.h>
+  // [[Rcpp::depends(RcppEigen)]]
+#else
+// Pure C++ environment
 #include <Eigen/Core>
-#include <map>
 #include <Eigen/Dense>
+
+#endif
+
+// Standard library includes (common to both environments)
 #include <map>
 #include <set>
 #include <vector>
@@ -18,6 +27,8 @@
 #include <cstdint>
 #include <iterator>
 #include <memory>
+
+// Local includes
 #include "./sel2selnew_optimization.h"
 
 struct ModelSelectionResult {
