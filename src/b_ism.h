@@ -5,26 +5,41 @@
 #ifndef CPP_B_ISM_H
 #define CPP_B_ISM_H
 
-#include <Eigen/src/Cholesky/LDLT.h>
-#include <Rcpp.h>
+#ifdef RCPP_EIGEN
+// R environment
 #include <RcppEigen.h>
+// [[Rcpp::depends(RcppEigen)]]
+#else
+// Pure C++ environment
+#include <Eigen/src/Cholesky/LDLT.h>
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
+
+#endif
+
+// Standard library includes (common to both environments)
 #include <algorithm>
-#include <cstdint>
+#include <chrono>
+#include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <random>
 #include <set>
+#include <string>
+#include <thread>
+#include <vector>
 
-#include "./model_selection/ms_base.h"
+// Local includes (adjust paths as necessary)
+#include "model_selection/ms_base.h"
 #include "model_selection/ms_no_optimization.h"
 #include "model_selection/ms_parallel_z.h"
 #include "model_selection/ms_split_z.h"
 #include "mombf/cstat.h"
 #include "progressbar.h"
 
+// Rcpp
+#include <Rcpp.h>
 // [[Rcpp::depends(RcppEigen)]]
 
 enum ModelSelectionVersion {
@@ -62,6 +77,7 @@ void b_ism(
     BismResults &results,
     ModelSelectionVersion model_selection_version);
 
+#ifdef RCPP_EIGEN
 Rcpp::List b_ism_wrapper(
     Rcpp::NumericMatrix data,
     bool include_constant,
@@ -87,5 +103,5 @@ Rcpp::List b_ism_wrapper(
     double pip_thr,
     bool w_sis_rand,
     bool geweke);
-
+#endif
 #endif  // CPP_B_ISM_H

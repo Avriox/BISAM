@@ -2,14 +2,8 @@
 // Created by jakob on 9/13/24.
 //
 
-#include <Eigen/Core>
-#include <map>
-#include <vector>
-#include <stdexcept>
-#include "./ms_base.h"
+
 #include "ms_no_optimization.h"
-#include "mombf/modelSel_regression.h"
-#include "mombf/cstat.h"
 
 
 Eigen::VectorXi model_selection_no_optimization(

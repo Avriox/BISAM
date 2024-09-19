@@ -3,8 +3,18 @@
 #ifndef CROSSPRODMAT
 #define CROSSPRODMAT 1
 
+#ifdef RCPP_EIGEN
+// R environment
+#include <RcppEigen.h>
+  // [[Rcpp::depends(RcppEigen)]]
+#else
+// Pure C++ environment
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
+
+#endif
+
+// Standard library includes (common to both environments)
 #include <memory>
 // we only include RcppArmadillo.h which pulls Rcpp.h in for us
 //#include "RcppArmadillo.h"
@@ -53,6 +63,7 @@ public:
     ~crossprodmat();
 
     double at(int k);  // Access element with vector-type index A(k)= A(i,j) where j= k/nrow; i= k % nrow
+
 
 private:
 

@@ -45,8 +45,7 @@
 #include <exception>
 #include <vector>
 #include "PolynomialRootFinder.h"
-//#include <R.h>
-//#include <Rinternals.h>
+
 
 //======================================================================
 //  Class definition.

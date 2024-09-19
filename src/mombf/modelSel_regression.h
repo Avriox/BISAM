@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include "crossprodmat.h"
 #include "Polynomial.h"
+#include "cstat.h"
 
 
 /*****************************************************************************************************************
@@ -141,6 +142,7 @@ double f2opt_imom(double *th);
 double fimomNegC_non0(double *th, crossprodmat *XtX, double *ytX, double *phi, double *tau, int *n, int *p, int *sel,
                       int *nsel);
 
+
 void
 fppimomNegC_non0(double **ans, double *th, crossprodmat *XtX, double *ytX, double *phi, double *tau, int *n, int *p,
                  int *sel, int *nsel);
@@ -151,6 +153,7 @@ void imomModeK(double *th, PolynomialRootFinder::RootStatus_T *status, crossprod
 
 double IS_imom(double *thopt, double **Voptinv, int *sel, int *nsel, int *n, int *p, crossprodmat *XtX, double *ytX,
                double *phi, double *tau, int *B);
+
 
 #endif /* MODELSEL_H */
 

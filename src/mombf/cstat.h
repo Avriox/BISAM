@@ -244,6 +244,8 @@ void Ax(double **A, const double *x, double *z, int rowini, int rowfi, int colin
 //                               const int *sel); // same but A is formatted as vector & only a subset of x, A is to be used
 double quadratic_xtAselx(const double *x, crossprodmat *A, const int *ncolA, const int *nsel,
                          const int *sel); //same but subset is only for A
+double quadratic_xtAselx_eigen(const Eigen::VectorXd &x, const Eigen::MatrixXd &A, const Eigen::VectorXi &sel);
+
 //double quadratic_xseltAxsel(const double *x, double **A, int ini, const int *nsel,
 //                            const int *sel); //same but subset is only for x
 //
@@ -451,6 +453,13 @@ void rtmvnormOutside_Gibbs(double *z, double *Dj, double *alpha, double **D, int
 //              int logscale); //density of t_nu(mu[i],s[i]^2) mixtures with ncomp components
 double dmvtC(const double *y, int n, const double *mu, double **cholsinv, double det, int nu,
              int logscale); //density of multivariate t
+double dmvtC_eigen(const Eigen::VectorXd &y,
+                   const Eigen::VectorXd &mu,
+                   const Eigen::MatrixXd &cholsinv,
+                   double det,
+                   int nu,
+                   bool logscale);
+
 //double rtC(int nu); //draw from univariate t with nu degrees of freedom
 //double rtmixC(const double *mu, const double *s, const double *probs, int nu,
 //              int ncomp); //draw from mixture of t_nu(mu[i],s[i]^2)
@@ -460,6 +469,8 @@ double dmvtC(const double *y, int n, const double *mu, double **cholsinv, double
 //double ptC(double x, int nu);  //CDF of t-Student with nu degrees of freedom
 void
 rmvtC(double *y, int n, const double *mu, double **chols, int nu); //draw from multivar T with nu degrees of freedom
+void rmvtC_eigen(Eigen::VectorXd &y, const Eigen::VectorXd &mu, const Eigen::MatrixXd &chols, int nu);
+
 //
 ////chi-square
 //double rchisqC(int df);

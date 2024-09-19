@@ -48,8 +48,8 @@ int main_wo_r() {
     int i_index = 0; // -1 from R code because of 0 Indexing
     int t_index = 1; // -1 from R code because of 0 Indexing
     int y_index = 2; // -1 from R code because of 0 Indexing
-    long Ndraw = 1000L;
-    long Nburn = 500L;
+    long Ndraw = 5000L;
+    long Nburn = 1000L;
     double lambda_b = 1000;
     double c0 = 0.0001;
     double C0 = 0.0001;
