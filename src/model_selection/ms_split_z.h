@@ -5,9 +5,9 @@
 #ifndef CPP_MS_SPLIT_Z_H
 #define CPP_MS_SPLIT_Z_H
 
-#include "ms_base.h"
+#include "./ms_base.h"
 #include "../mombf/modselIntegrals.h"
-#include "ms_no_optimization.h"
+#include "./ms_no_optimization.h"
 
 std::vector<Eigen::MatrixXi> splitMatrix(const Eigen::MatrixXi &x, int sub_rows, int sub_cols);
 

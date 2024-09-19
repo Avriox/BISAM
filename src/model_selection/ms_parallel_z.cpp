@@ -2,7 +2,7 @@
 // Created by jakob on 9/17/24.
 //
 
-#include "ms_parallel_z.h"
+#include "./ms_parallel_z.h"
 
 
 // Worker function for thread pool

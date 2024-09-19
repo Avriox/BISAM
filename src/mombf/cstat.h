@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include "crossprodmat.h"
+#include "./crossprodmat.h"
 
 //#include <R.h>
 //#include <Rinternals.h>

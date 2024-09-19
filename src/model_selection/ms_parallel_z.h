@@ -6,9 +6,9 @@
 #define CPP_MS_PARALLEL_Z_H
 
 // Local includes
-#include "ms_base.h"
-#include "ms_no_optimization.h"
-#include "ms_split_z.h"
+#include "./ms_base.h"
+#include "./ms_no_optimization.h"
+#include "./ms_split_z.h"
 #include "../mombf/modselIntegrals.h"
 #include "../SafeQueue.h"
 

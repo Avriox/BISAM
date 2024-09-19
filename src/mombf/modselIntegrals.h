@@ -4,8 +4,8 @@
 //#include <Rcpp.h>
 #include <map>
 #include <string>
-#include "modelSel_regression.h"
-#include "cstat.h"
+#include "./modelSel_regression.h"
+#include "./cstat.h"
 
 using namespace std;
 

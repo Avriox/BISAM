@@ -7,9 +7,9 @@
 #include <math.h>
 #include <vector>
 #include <stdlib.h>
-#include "crossprodmat.h"
-#include "Polynomial.h"
-#include "cstat.h"
+#include "./crossprodmat.h"
+#include "./Polynomial.h"
+#include "./cstat.h"
 
 
 /*****************************************************************************************************************

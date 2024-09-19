@@ -44,7 +44,7 @@
 #include <assert.h>
 #include <exception>
 #include <vector>
-#include "PolynomialRootFinder.h"
+#include "./PolynomialRootFinder.h"
 
 
 //======================================================================
