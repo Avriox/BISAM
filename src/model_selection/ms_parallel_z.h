@@ -18,13 +18,6 @@
 #include <condition_variable>
 #include <future>
 
-// If you need any R-specific functionality, you can use:
-#ifdef RCPP_EIGEN
-// R-specific includes or declarations here
-  // For example:
-  // #include <Rcpp.h>
-#endif
-
 
 #define NUM_THREADS 16
 

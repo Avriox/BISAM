@@ -518,7 +518,7 @@ void b_ism(
     timer.print_section_summary();
 }
 
-#ifdef RCPP_EIGEN
+
 // Wrapper function for R
 // [[Rcpp::export]]
 Rcpp::List b_ism_wrapper(
@@ -604,4 +604,3 @@ Rcpp::List b_ism_wrapper(
         Rcpp::stop("Unknown exception caught");
     }
 }
-#endif

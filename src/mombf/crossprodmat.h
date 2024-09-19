@@ -3,16 +3,10 @@
 #ifndef CROSSPRODMAT
 #define CROSSPRODMAT 1
 
-#ifdef RCPP_EIGEN
-// R environment
+
 #include <RcppEigen.h>
 // [[Rcpp::depends(RcppEigen)]]
-#else
-// Pure C++ environment
-#include <Eigen/Dense>
-#include <Eigen/Sparse>
 
-#endif
 
 // Standard library includes (common to both environments)
 #include <memory>
@@ -56,14 +50,14 @@ using namespace std;
 // };
 
 class crossprodmat {
-   public:
+public:
     crossprodmat(double *mymat, int nrowx, int ncolx, bool dense);
 
     ~crossprodmat();
 
     double at(int k);  // Access element with vector-type index A(k)= A(i,j) where j= k/nrow; i= k % nrow
 
-   private:
+private:
     //    std::unique_ptr<double[]> x;
     //    Eigen::MatrixXd XtXd;
     std::vector<double> XtXd;

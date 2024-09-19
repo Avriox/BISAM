@@ -5,15 +5,10 @@
 #ifndef CPP_MS_NO_OPTIMIZATION_H
 #define CPP_MS_NO_OPTIMIZATION_H
 
-#ifdef RCPP_EIGEN
-// R environment
-#include <RcppEigen.h>
-  // [[Rcpp::depends(RcppEigen)]]
-#else
-// Pure C++ environment
-#include <Eigen/Core>
 
-#endif
+#include <RcppEigen.h>
+// [[Rcpp::depends(RcppEigen)]]
+
 
 // Standard library includes (common to both environments)
 #include <map>

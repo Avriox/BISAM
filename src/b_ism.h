@@ -5,17 +5,10 @@
 #ifndef CPP_B_ISM_H
 #define CPP_B_ISM_H
 
-#ifdef RCPP_EIGEN
-// R environment
-#include <RcppEigen.h>
-  // [[Rcpp::depends(RcppEigen)]]
-#else
-// Pure C++ environment
-#include <Eigen/Dense>
-#include <Eigen/Core>
-#include <Eigen/src/Cholesky/LDLT.h>
 
-#endif
+#include <RcppEigen.h>
+// [[Rcpp::depends(RcppEigen)]]
+
 
 // Standard library includes (common to both environments)
 #include <vector>
@@ -39,7 +32,6 @@
 
 // Rcpp
 #include <Rcpp.h>
-// [[Rcpp::depends(RcppEigen)]]
 
 enum ModelSelectionVersion {
     NO_OPTIMIZATION,
@@ -79,7 +71,6 @@ void b_ism(
         ModelSelectionVersion model_selection_version
 );
 
-#ifdef RCPP_EIGEN
 Rcpp::List b_ism_wrapper(
         Rcpp::NumericMatrix data,
         bool include_constant,
@@ -106,5 +97,5 @@ Rcpp::List b_ism_wrapper(
         bool w_sis_rand,
         bool geweke
 );
-#endif
+
 #endif //CPP_B_ISM_H
