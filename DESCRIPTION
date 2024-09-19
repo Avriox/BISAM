@@ -4,16 +4,16 @@ Title: What the Package Does (One Line, Title Case)
 Version: 0.0.1
 Date: 2024-09-19
 Author: Jakob Goldmann
-Maintainer: Jakob Goldmann <a@b.cd>
+Maintainer: Jakob Goldmann <your.email@example.com>
 Description: More about what the package does (maybe more than one line).
 License: What license it uses
-Imports: 
+Imports:
     Rcpp (>= 1.0.7),
     RcppEigen (>= 0.3.3.9.1)
-LinkingTo: 
+LinkingTo:
     Rcpp,
     RcppEigen
-Suggests: 
+Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Encoding: UTF-8

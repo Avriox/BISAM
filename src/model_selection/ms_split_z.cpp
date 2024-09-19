@@ -2,8 +2,9 @@
 // Created by jakob on 9/17/24.
 //
 
-#include <iostream>
 #include "ms_split_z.h"
+
+#include <iostream>
 
 std::vector<Eigen::MatrixXi> splitMatrix(const Eigen::MatrixXi &x, int sub_rows, int sub_cols) {
     int n = x.cols() / sub_cols;
@@ -48,26 +49,22 @@ std::vector<Eigen::VectorXd> splitVector(const Eigen::VectorXd &x, int sub_size)
     return result;
 }
 
-
+// [[Rcpp::export]]
 Eigen::VectorXi model_selection_split_z(
-        Eigen::VectorXd y,
-        Eigen::MatrixXi x,
-        int n_iter,
-        msPriorSpec prior_coef,
-        msPriorSpec prior_delta,
-        double phi,
-        Eigen::VectorXi w_i,
-        int n_observations,
-        int n_timeperiods
-) {
-
-
-
-//    std::cout << "x:" << std::endl << x << std::endl << std::endl;
-//
-//    std::cout << "y:" << std::endl << y << std::endl << std::endl;
-//
-//    std::cout << "w_i:" << std::endl << w_i << std::endl << std::endl;
+    Eigen::VectorXd y,
+    Eigen::MatrixXi x,
+    int n_iter,
+    msPriorSpec prior_coef,
+    msPriorSpec prior_delta,
+    double phi,
+    Eigen::VectorXi w_i,
+    int n_observations,
+    int n_timeperiods) {
+    //    std::cout << "x:" << std::endl << x << std::endl << std::endl;
+    //
+    //    std::cout << "y:" << std::endl << y << std::endl << std::endl;
+    //
+    //    std::cout << "w_i:" << std::endl << w_i << std::endl << std::endl;
 
     std::vector<Eigen::MatrixXi> split_xs = splitMatrix(x, n_timeperiods, n_observations);
     std::vector<Eigen::VectorXd> split_ys = splitVector(y, n_timeperiods);
@@ -84,10 +81,7 @@ Eigen::VectorXi model_selection_split_z(
                                                                       phi, split_wi, n_observations, n_timeperiods);
 
         post_samples.segment(n_observations * i, n_observations) = post_sample;
-
     }
 
     return post_samples;
-
-
 }
