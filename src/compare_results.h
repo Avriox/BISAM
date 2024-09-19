@@ -11,14 +11,10 @@
 #include <algorithm>
 #include <cmath>
 
-#ifdef RCPP_EIGEN
+
 #include <RcppEigen.h>
 // [[Rcpp::depends(RcppEigen)]]
-#else
 
-#include <Eigen/Dense>
-
-#endif
 // Assume BismResults struct is defined here
 
 void print_colored(double value, const std::string &color) {

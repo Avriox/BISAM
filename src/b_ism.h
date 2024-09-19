@@ -21,12 +21,12 @@
 #include <vector>
 
 // Local includes (adjust paths as necessary)
-#include "model_selection/ms_base.h"
-#include "model_selection/ms_no_optimization.h"
-#include "model_selection/ms_parallel_z.h"
-#include "model_selection/ms_split_z.h"
-#include "mombf/cstat.h"
-#include "progressbar.h"
+#include "./model_selection/ms_base.h"
+#include "./model_selection/ms_no_optimization.h"
+#include "./model_selection/ms_parallel_z.h"
+#include "./model_selection/ms_split_z.h"
+#include "./mombf/cstat.h"
+#include "./progressbar.h"
 
 // Rcpp
 #include <Rcpp.h>

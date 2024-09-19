@@ -1,7 +1,7 @@
 
-#include "b_ism.h"
-#include "compare_results.h"
-#include "exec_timer.h"
+#include "./b_ism.h"
+#include "./compare_results.h"
+#include "./exec_timer.h"
 
 int main_wo_r() {
 
