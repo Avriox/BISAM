@@ -40,9 +40,9 @@ int main_wo_r() {
             3, 10, 2.72656784, -0.24980976, -0.11055986, 0.75599906;
 
 
-    bool include_constant = true;
-    bool tfe = false;
-    bool ife = false;
+    bool include_constant = false;
+    bool tfe = true;
+    bool ife = true;
     bool iis = true;
     bool sis = true;
     int i_index = 0; // -1 from R code because of 0 Indexing
@@ -83,26 +83,6 @@ int main_wo_r() {
 //                                    ModelSelectionVersion::NO_OPTIMIZATION
 //    );
 
-    function_timer.register_and_run("Parallel Z", b_ism,
-                                    data,
-                                    include_constant,
-                                    tfe,
-                                    ife,
-                                    iis,
-                                    sis,
-                                    y_index,
-                                    i_index,
-                                    t_index,
-                                    Ndraw,
-                                    Nburn,
-                                    b_prior,
-                                    lambda_b,
-                                    c0,
-                                    C0,
-                                    geweke,
-                                    result1,
-                                    ModelSelectionVersion::SPLIT_MATRIX_PARALLEL
-    );
 
     function_timer.register_and_run("Split z", b_ism,
                                     data,
@@ -124,6 +104,28 @@ int main_wo_r() {
                                     result2,
                                     ModelSelectionVersion::SPLIT_MATRIX
     );
+
+    function_timer.register_and_run("Parallel Z", b_ism,
+                                    data,
+                                    include_constant,
+                                    tfe,
+                                    ife,
+                                    iis,
+                                    sis,
+                                    y_index,
+                                    i_index,
+                                    t_index,
+                                    Ndraw,
+                                    Nburn,
+                                    b_prior,
+                                    lambda_b,
+                                    c0,
+                                    C0,
+                                    geweke,
+                                    result1,
+                                    ModelSelectionVersion::SPLIT_MATRIX_PARALLEL
+    );
+
 
     function_timer.print_function_summary();
 

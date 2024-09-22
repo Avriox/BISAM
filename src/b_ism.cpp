@@ -93,25 +93,25 @@ void b_ism(
         X.col(X.cols() - 1) = const_col;
     }
 
+//     TODO UNTESTED
+    if (ife) {
+        Eigen::MatrixXd IFE = kroneckerProduct(Eigen::MatrixXd::Identity(n, n), Eigen::MatrixXd::Ones(t, 1));
+        X.conservativeResize(X.rows(), X.cols() + IFE.cols());
+        X.rightCols(IFE.cols()) = IFE;
+    }
     // TODO UNTESTED
-//    if (ife) {
-//        Eigen::MatrixXd IFE = kroneckerProduct(Eigen::MatrixXd::Identity(n, n), Eigen::MatrixXd::Ones(t, 1));
-//        X.conservativeResize(X.rows(), X.cols() + IFE.cols());
-//        X.rightCols(IFE.cols()) = IFE;
-//    }
-//    // TODO UNTESTED
-//    if (tfe) {
-//        Eigen::MatrixXd TFE = kroneckerProduct(Eigen::MatrixXd::Ones(n, 1), Eigen::MatrixXd::Identity(t, t));
-//        X.conservativeResize(X.rows(), X.cols() + TFE.cols());
-//        X.rightCols(TFE.cols()) = TFE;
-//    }
-//    // TODO UNTESTED
-//    if (tfe && ife && !include_constant) {
-//        std::cerr
-//                << "Warning: Both time and unit fixed effects used.\nDropping first indiv. FE to avoid perfect collinearity"
-//                << std::endl;
-//        X.conservativeResize(X.rows(), X.cols() - 1);
-//    }
+    if (tfe) {
+        Eigen::MatrixXd TFE = kroneckerProduct(Eigen::MatrixXd::Ones(n, 1), Eigen::MatrixXd::Identity(t, t));
+        X.conservativeResize(X.rows(), X.cols() + TFE.cols());
+        X.rightCols(TFE.cols()) = TFE;
+    }
+    // TODO UNTESTED
+    if (tfe && ife && !include_constant) {
+        std::cerr
+                << "Warning: Both time and unit fixed effects used.\nDropping first indiv. FE to avoid perfect collinearity"
+                << std::endl;
+        X.conservativeResize(X.rows(), X.cols() - 1);
+    }
 
     // Find Matrix dimensions
     int p = X.cols();
@@ -201,6 +201,9 @@ void b_ism(
     Eigen::MatrixXd XX = X.transpose() * X;
     Eigen::MatrixXi ZZ = Z.transpose() * Z;
 
+//    std::cout << "X: \n" << X << std::endl << std::endl;
+//
+//    std::cout << "XX: \n" << XX << std::endl << std::endl;
 
     // Prior Parameters
     Eigen::VectorXd b0;
