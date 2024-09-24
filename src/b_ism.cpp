@@ -642,3 +642,76 @@ Rcpp::List b_ism_wrapper(
         Rcpp::stop("Unknown exception caught");
     }
 }
+
+
+// [[Rcpp::export]]
+Rcpp::NumericVector rnlp_wrapper(
+        int niter,
+        int burnin,
+        int thinning,
+        Rcpp::NumericVector y,
+        Rcpp::IntegerMatrix x,
+        double tau,
+        double a_phi,
+        double b_phi,
+        int prior,
+        Rcpp::NumericVector thini,
+        double phiini
+) {
+    try {
+        int n = y.size();
+        int p = x.ncol();
+        int r = 1; // As per the example provided
+
+        // Prepare the ans vector
+        Rcpp::NumericVector ans(x.ncol());
+
+        // Call the C++ function
+        rnlpPost_lm(ans.begin(), niter, burnin, thinning, y.begin(), x.begin(), n, p, r,
+                    tau, a_phi, b_phi, prior, thini.begin(), phiini);
+
+        return ans;
+    } catch (const std::exception &ex) {
+        Rcpp::stop("Exception caught in rnlp_wrapper: %s", ex.what());
+    } catch (...) {
+        Rcpp::stop("Unknown exception caught in rnlp_wrapper");
+    }
+}
+
+// [[Rcpp::export]]
+Rcpp::IntegerVector model_selection_wrapper(
+        Rcpp::NumericVector y,
+        Rcpp::IntegerMatrix x,
+        int n_iter,
+        double tau_g,
+        double va,
+        double vb,
+        double phi,
+        Rcpp::IntegerVector w_i,
+        int n_observations,
+        int n_timeperiods
+) {
+    try {
+        // Convert R types to Eigen types
+        Eigen::VectorXd y_eigen = Rcpp::as<Eigen::VectorXd>(y);
+        Eigen::MatrixXi x_eigen = Rcpp::as<Eigen::MatrixXi>(x);
+        Eigen::VectorXi w_i_eigen = Rcpp::as<Eigen::VectorXi>(w_i);
+
+        // Create prior specifications
+        msPriorSpec priorCoef = imomprior(tau_g);
+        msPriorSpec priorDelta = modelbbprior(va, vb);
+
+        // Call the C++ function
+        Eigen::VectorXi result = model_selection_no_optimization(
+                y_eigen, x_eigen, n_iter, priorCoef, priorDelta, phi,
+                w_i_eigen, n_observations, n_timeperiods
+        );
+
+        // Convert the result back to R type
+        return Rcpp::wrap(result);
+    } catch (const std::exception &ex) {
+        Rcpp::stop("Exception caught in model_selection_wrapper: %s", ex.what());
+    } catch (...) {
+        Rcpp::stop("Unknown exception caught in model_selection_wrapper");
+    }
+}
