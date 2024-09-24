@@ -12,8 +12,8 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // b_ism_wrapper
-Rcpp::List b_ism_wrapper(Rcpp::NumericMatrix data, bool include_constant, bool tfe, bool ife, bool iis, bool sis, int y_index, int i_index, int t_index, long Ndraw, long Nburn, std::string b_prior, double lambda_b, double c0, double C0, bool geweke, std::string model_sel_optimization);
-RcppExport SEXP _BISAM_b_ism_wrapper(SEXP dataSEXP, SEXP include_constantSEXP, SEXP tfeSEXP, SEXP ifeSEXP, SEXP iisSEXP, SEXP sisSEXP, SEXP y_indexSEXP, SEXP i_indexSEXP, SEXP t_indexSEXP, SEXP NdrawSEXP, SEXP NburnSEXP, SEXP b_priorSEXP, SEXP lambda_bSEXP, SEXP c0SEXP, SEXP C0SEXP, SEXP gewekeSEXP, SEXP model_sel_optimizationSEXP) {
+Rcpp::List b_ism_wrapper(Rcpp::NumericMatrix data, bool include_constant, bool tfe, bool ife, bool iis, bool sis, int y_index, int i_index, int t_index, long Ndraw, long Nburn, std::string b_prior, double lambda_b, double c0, double C0, bool geweke, double tau, double va, double vb, std::string model_sel_optimization);
+RcppExport SEXP _BISAM_b_ism_wrapper(SEXP dataSEXP, SEXP include_constantSEXP, SEXP tfeSEXP, SEXP ifeSEXP, SEXP iisSEXP, SEXP sisSEXP, SEXP y_indexSEXP, SEXP i_indexSEXP, SEXP t_indexSEXP, SEXP NdrawSEXP, SEXP NburnSEXP, SEXP b_priorSEXP, SEXP lambda_bSEXP, SEXP c0SEXP, SEXP C0SEXP, SEXP gewekeSEXP, SEXP tauSEXP, SEXP vaSEXP, SEXP vbSEXP, SEXP model_sel_optimizationSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -33,14 +33,17 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type c0(c0SEXP);
     Rcpp::traits::input_parameter< double >::type C0(C0SEXP);
     Rcpp::traits::input_parameter< bool >::type geweke(gewekeSEXP);
+    Rcpp::traits::input_parameter< double >::type tau(tauSEXP);
+    Rcpp::traits::input_parameter< double >::type va(vaSEXP);
+    Rcpp::traits::input_parameter< double >::type vb(vbSEXP);
     Rcpp::traits::input_parameter< std::string >::type model_sel_optimization(model_sel_optimizationSEXP);
-    rcpp_result_gen = Rcpp::wrap(b_ism_wrapper(data, include_constant, tfe, ife, iis, sis, y_index, i_index, t_index, Ndraw, Nburn, b_prior, lambda_b, c0, C0, geweke, model_sel_optimization));
+    rcpp_result_gen = Rcpp::wrap(b_ism_wrapper(data, include_constant, tfe, ife, iis, sis, y_index, i_index, t_index, Ndraw, Nburn, b_prior, lambda_b, c0, C0, geweke, tau, va, vb, model_sel_optimization));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_BISAM_b_ism_wrapper", (DL_FUNC) &_BISAM_b_ism_wrapper, 17},
+    {"_BISAM_b_ism_wrapper", (DL_FUNC) &_BISAM_b_ism_wrapper, 20},
     {NULL, NULL, 0}
 };
 
