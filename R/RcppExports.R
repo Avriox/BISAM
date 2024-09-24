@@ -5,3 +5,11 @@ b_ism_wrapper <- function(data, include_constant, tfe, ife, iis, sis, y_index, i
     .Call(`_BISAM_b_ism_wrapper`, data, include_constant, tfe, ife, iis, sis, y_index, i_index, t_index, Ndraw, Nburn, b_prior, lambda_b, c0, C0, geweke, tau, va, vb, model_sel_optimization)
 }
 
+rnlp_wrapper <- function(niter, burnin, thinning, y, x, tau, a_phi, b_phi, prior, thini, phiini) {
+    .Call(`_BISAM_rnlp_wrapper`, niter, burnin, thinning, y, x, tau, a_phi, b_phi, prior, thini, phiini)
+}
+
+model_selection_wrapper <- function(y, x, n_iter, tau_g, va, vb, phi, w_i, n_observations, n_timeperiods) {
+    .Call(`_BISAM_model_selection_wrapper`, y, x, n_iter, tau_g, va, vb, phi, w_i, n_observations, n_timeperiods)
+}
+

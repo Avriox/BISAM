@@ -41,9 +41,52 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rnlp_wrapper
+Rcpp::NumericVector rnlp_wrapper(int niter, int burnin, int thinning, Rcpp::NumericVector y, Rcpp::IntegerMatrix x, double tau, double a_phi, double b_phi, int prior, Rcpp::NumericVector thini, double phiini);
+RcppExport SEXP _BISAM_rnlp_wrapper(SEXP niterSEXP, SEXP burninSEXP, SEXP thinningSEXP, SEXP ySEXP, SEXP xSEXP, SEXP tauSEXP, SEXP a_phiSEXP, SEXP b_phiSEXP, SEXP priorSEXP, SEXP thiniSEXP, SEXP phiiniSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type niter(niterSEXP);
+    Rcpp::traits::input_parameter< int >::type burnin(burninSEXP);
+    Rcpp::traits::input_parameter< int >::type thinning(thinningSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type y(ySEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerMatrix >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type tau(tauSEXP);
+    Rcpp::traits::input_parameter< double >::type a_phi(a_phiSEXP);
+    Rcpp::traits::input_parameter< double >::type b_phi(b_phiSEXP);
+    Rcpp::traits::input_parameter< int >::type prior(priorSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type thini(thiniSEXP);
+    Rcpp::traits::input_parameter< double >::type phiini(phiiniSEXP);
+    rcpp_result_gen = Rcpp::wrap(rnlp_wrapper(niter, burnin, thinning, y, x, tau, a_phi, b_phi, prior, thini, phiini));
+    return rcpp_result_gen;
+END_RCPP
+}
+// model_selection_wrapper
+Rcpp::IntegerVector model_selection_wrapper(Rcpp::NumericVector y, Rcpp::IntegerMatrix x, int n_iter, double tau_g, double va, double vb, double phi, Rcpp::IntegerVector w_i, int n_observations, int n_timeperiods);
+RcppExport SEXP _BISAM_model_selection_wrapper(SEXP ySEXP, SEXP xSEXP, SEXP n_iterSEXP, SEXP tau_gSEXP, SEXP vaSEXP, SEXP vbSEXP, SEXP phiSEXP, SEXP w_iSEXP, SEXP n_observationsSEXP, SEXP n_timeperiodsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type y(ySEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerMatrix >::type x(xSEXP);
+    Rcpp::traits::input_parameter< int >::type n_iter(n_iterSEXP);
+    Rcpp::traits::input_parameter< double >::type tau_g(tau_gSEXP);
+    Rcpp::traits::input_parameter< double >::type va(vaSEXP);
+    Rcpp::traits::input_parameter< double >::type vb(vbSEXP);
+    Rcpp::traits::input_parameter< double >::type phi(phiSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type w_i(w_iSEXP);
+    Rcpp::traits::input_parameter< int >::type n_observations(n_observationsSEXP);
+    Rcpp::traits::input_parameter< int >::type n_timeperiods(n_timeperiodsSEXP);
+    rcpp_result_gen = Rcpp::wrap(model_selection_wrapper(y, x, n_iter, tau_g, va, vb, phi, w_i, n_observations, n_timeperiods));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_BISAM_b_ism_wrapper", (DL_FUNC) &_BISAM_b_ism_wrapper, 20},
+    {"_BISAM_rnlp_wrapper", (DL_FUNC) &_BISAM_rnlp_wrapper, 11},
+    {"_BISAM_model_selection_wrapper", (DL_FUNC) &_BISAM_model_selection_wrapper, 10},
     {NULL, NULL, 0}
 };
 
