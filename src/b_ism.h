@@ -68,34 +68,30 @@ void b_ism(
         double C0,
         bool geweke,
         BismResults &results,
+        double tau,
+        double va,
+        double vb,
         ModelSelectionVersion model_selection_version
 );
 
-Rcpp::List b_ism_wrapper(
-        Rcpp::NumericMatrix data,
-        bool include_constant,
-        bool tfe,
-        bool ife,
-        bool iis,
-        bool sis,
-        int y_index,
-        int i_index,
-        int t_index,
-        long Ndraw,
-        long Nburn,
-        std::string b_prior,
-        double lambda_a,
-        double lambda_b,
-        double lambda_g,
-        double c0,
-        double C0,
-        double oa,
-        double ob,
-        double va,
-        double vb,
-        double pip_thr,
-        bool w_sis_rand,
-        bool geweke
-);
+//Rcpp::List b_ism_wrapper(
+//        Rcpp::NumericMatrix data,
+//        bool include_constant,
+//        bool tfe,
+//        bool ife,
+//        bool iis,
+//        bool sis,
+//        int y_index,
+//        int i_index,
+//        int t_index,
+//        long Ndraw,
+//        long Nburn,
+//        std::string b_prior,
+//        double lambda_b,
+//        double c0,
+//        double C0,
+//        double va,
+//        double vb,
+//);
 
 #endif //CPP_B_ISM_H

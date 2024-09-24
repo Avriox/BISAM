@@ -26,6 +26,9 @@ void b_ism(
         double C0,
         bool geweke,
         BismResults &results,
+        double tau,
+        double va,
+        double vb,
         ModelSelectionVersion model_selection_version
 ) {
 
@@ -86,32 +89,60 @@ void b_ism(
     int t = unique_t.size();
     int N = n * t;
 
+
+    int x_cols_before = X.cols();
     // Build X matrix
+
+//    std::cout << "X1: " << std::endl << X << std::endl << std::endl;
+
     if (include_constant) {
         Eigen::MatrixXd const_col = Eigen::MatrixXd::Ones(X.rows(), 1);
         X.conservativeResize(X.rows(), X.cols() + 1);
         X.col(X.cols() - 1) = const_col;
     }
 
-//     TODO UNTESTED
+//    std::cout << "X2: " << std::endl << X << std::endl << std::endl;
+
     if (ife) {
         Eigen::MatrixXd IFE = kroneckerProduct(Eigen::MatrixXd::Identity(n, n), Eigen::MatrixXd::Ones(t, 1));
+
+        // If we also have include_const, remove the first column of IFE again
+        if (include_constant) {
+            IFE = IFE.rightCols(IFE.cols() - 1);
+        }
+
         X.conservativeResize(X.rows(), X.cols() + IFE.cols());
         X.rightCols(IFE.cols()) = IFE;
     }
-    // TODO UNTESTED
+
+//    std::cout << "X3: " << std::endl << X << std::endl << std::endl;
+
     if (tfe) {
         Eigen::MatrixXd TFE = kroneckerProduct(Eigen::MatrixXd::Ones(n, 1), Eigen::MatrixXd::Identity(t, t));
+
+        if (include_constant) {
+            TFE = TFE.rightCols(TFE.cols() - 1);
+        }
+
         X.conservativeResize(X.rows(), X.cols() + TFE.cols());
         X.rightCols(TFE.cols()) = TFE;
     }
-    // TODO UNTESTED
+
+//    std::cout << "X4: " << std::endl << X << std::endl << std::endl;
+
     if (tfe && ife && !include_constant) {
         std::cerr
                 << "Warning: Both time and unit fixed effects used.\nDropping first indiv. FE to avoid perfect collinearity"
                 << std::endl;
+
+        // Remove the specified column from X
+        X.block(0, x_cols_before, X.rows(), X.cols() - x_cols_before - 1) =
+                X.rightCols(X.cols() - x_cols_before - 1);
         X.conservativeResize(X.rows(), X.cols() - 1);
     }
+
+//    std::cout << "X5: " << std::endl << X << std::endl << std::endl;
+
 
     // Find Matrix dimensions
     int p = X.cols();
@@ -277,7 +308,8 @@ void b_ism(
 //    Eigen::VectorXd w_1 = z_cols.cast<double>().array() * w_i.array(); // columns where w_i is 1
 
 
-    double tau_g = 1.0;
+    // TODO no need to re-assign
+    double tau_g = tau;
     double xi_g = 1.0;
     Eigen::VectorXd lamb_g = Eigen::VectorXd::Ones(r);
 
@@ -422,7 +454,7 @@ void b_ism(
 
         // ausm loop
         msPriorSpec priorCoef = imomprior(tau_g);
-        msPriorSpec priorDelta = modelbbprior(1, 1);
+        msPriorSpec priorDelta = modelbbprior(va, vb);
 
 
 //        std::cout << "Z:" << std::endl << Z << std::endl << std::endl;
@@ -541,6 +573,9 @@ Rcpp::List b_ism_wrapper(
         double c0,
         double C0,
         bool geweke,
+        double tau,
+        double va,
+        double vb,
         std::string model_sel_optimization
 ) {
     try {
@@ -573,7 +608,7 @@ Rcpp::List b_ism_wrapper(
         // Call the b_ism function
         b_ism(
                 data_eigen, include_constant, tfe, ife, iis, sis, y_index, i_index, t_index,
-                Ndraw, Nburn, b_prior, lambda_b, c0, C0, geweke, results, model_selection_version
+                Ndraw, Nburn, b_prior, lambda_b, c0, C0, geweke, results, tau, va, vb, model_selection_version
         );
 
         // Convert BismResults to Rcpp::List
