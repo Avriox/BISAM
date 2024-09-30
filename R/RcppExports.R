@@ -9,7 +9,7 @@ rnlp_wrapper <- function(niter, burnin, thinning, y, x, tau, a_phi, b_phi, prior
     .Call(`_BISAM_rnlp_wrapper`, niter, burnin, thinning, y, x, tau, a_phi, b_phi, prior, thini, phiini)
 }
 
-model_selection_wrapper <- function(y, x, n_iter, tau_g, va, vb, phi, w_i, n_observations, n_timeperiods) {
-    .Call(`_BISAM_model_selection_wrapper`, y, x, n_iter, tau_g, va, vb, phi, w_i, n_observations, n_timeperiods)
+model_selection_wrapper <- function(y, x, n_iter, tau_g, va, vb, phi, w_i, n_observations, n_timeperiods, optimization_methode) {
+    .Call(`_BISAM_model_selection_wrapper`, y, x, n_iter, tau_g, va, vb, phi, w_i, n_observations, n_timeperiods, optimization_methode)
 }
 
