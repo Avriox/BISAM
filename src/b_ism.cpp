@@ -689,7 +689,8 @@ Rcpp::IntegerVector model_selection_wrapper(
         double phi,
         Rcpp::IntegerVector w_i,
         int n_observations,
-        int n_timeperiods
+        int n_timeperiods,
+        std::string optimization_methode
 ) {
     try {
         // Convert R types to Eigen types
@@ -701,14 +702,57 @@ Rcpp::IntegerVector model_selection_wrapper(
         msPriorSpec priorCoef = imomprior(tau_g);
         msPriorSpec priorDelta = modelbbprior(va, vb);
 
-        // Call the C++ function
-        Eigen::VectorXi result = model_selection_no_optimization(
-                y_eigen, x_eigen, n_iter, priorCoef, priorDelta, phi,
-                w_i_eigen, n_observations, n_timeperiods
-        );
+        if (optimization_methode == "No Optimization") {
+            std::cout << "Running with model_selection: 'No Optimization'" << std::endl;
+            // Call the C++ function
+            Eigen::VectorXi result = model_selection_no_optimization(
+                    y_eigen, x_eigen, n_iter, priorCoef, priorDelta, phi,
+                    w_i_eigen, n_observations, n_timeperiods
+            );
 
-        // Convert the result back to R type
-        return Rcpp::wrap(result);
+            // Convert the result back to R type
+            return Rcpp::wrap(result);
+
+        } else if (optimization_methode == "Split Z") {
+            std::cout << "Running with model_selection: 'Split Z Matrix'" << std::endl;
+
+            // Call the C++ function
+            Eigen::VectorXi result = model_selection_split_z(
+                    y_eigen, x_eigen, n_iter, priorCoef, priorDelta, phi,
+                    w_i_eigen, n_observations, n_timeperiods
+            );
+
+            // Convert the result back to R type
+            return Rcpp::wrap(result);
+
+        } else if (optimization_methode == "Parallel Z") {
+            std::cout << "Running with model_selection: 'Split and Parallel Z Matrix'" << std::endl;
+
+            // Call the C++ function
+            Eigen::VectorXi result = model_selection_parallel_z(
+                    y_eigen, x_eigen, n_iter, priorCoef, priorDelta, phi,
+                    w_i_eigen, n_observations, n_timeperiods
+            );
+
+            // Convert the result back to R type
+            return Rcpp::wrap(result);
+
+        } else {
+            std::cout << "Selected Model Selection Version does not exist. Defaulting to 'No Optimization'";
+
+            // Call the C++ function
+            Eigen::VectorXi result = model_selection_no_optimization(
+                    y_eigen, x_eigen, n_iter, priorCoef, priorDelta, phi,
+                    w_i_eigen, n_observations, n_timeperiods
+            );
+
+            // Convert the result back to R type
+            return Rcpp::wrap(result);
+
+        }
+
+
+        ;
     } catch (const std::exception &ex) {
         Rcpp::stop("Exception caught in model_selection_wrapper: %s", ex.what());
     } catch (...) {
