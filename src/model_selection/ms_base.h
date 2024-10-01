@@ -80,10 +80,10 @@ struct FormatMsPriorsMargResult {
     int priorgr;
     double tau;
     double taugroup;
-    double alpha;
-    double lambda;
-    double taualpha;
-    double fixatanhalpha;
+//    double alpha;
+//    double lambda;
+//    double taualpha;
+//    double fixatanhalpha;
     msPriorSpec priorCoef;
     msPriorSpec priorGroup;
 };
@@ -93,8 +93,8 @@ struct Priors {
     msPriorSpec priorGroup;
     msPriorSpec priorDelta;
     msPriorSpec priorConstraints;
-    msPriorSpec priorVar;
-    msPriorSpec priorSkew;
+//    msPriorSpec priorVar;
+//    msPriorSpec priorSkew;
 };
 
 struct GroupConstraintInfo {
@@ -113,7 +113,7 @@ std::pair<int, int> get_family_info(const std::string &family, bool issurvival);
 
 
 FormatMsPriorsMargResult format_ms_priors_marg(const msPriorSpec &priorCoef, const msPriorSpec &priorGroup,
-                                               const msPriorSpec &priorVar, const msPriorSpec &priorSkew, int n);
+                                                int n); // const msPriorSpec &priorVar, const msPriorSpec &priorSkew,
 
 void count_constraints(Eigen::VectorXi &n_constraints, intptrvec *constraints,
                        Eigen::VectorXi &n_inv_constraints, intptrvec *inv_constraints,

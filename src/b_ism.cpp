@@ -454,6 +454,7 @@ void b_ism(
 
         // ausm loop
         msPriorSpec priorCoef = imomprior(tau_g);
+
         msPriorSpec priorDelta = modelbbprior(va, vb);
 
 

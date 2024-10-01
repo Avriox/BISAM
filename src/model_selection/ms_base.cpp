@@ -166,7 +166,7 @@ std::pair<int, int> get_family_info(const std::string &family, bool issurvival) 
 
 
 FormatMsPriorsMargResult format_ms_priors_marg(const msPriorSpec &priorCoef, const msPriorSpec &priorGroup,
-                                               const msPriorSpec &priorVar, const msPriorSpec &priorSkew, int n) {
+                                                int n) { // const msPriorSpec &priorVar, const msPriorSpec &priorSkew,
 
     int r = 1;
 
@@ -176,10 +176,10 @@ FormatMsPriorsMargResult format_ms_priors_marg(const msPriorSpec &priorCoef, con
     int prior = 1;
     int priorgr = 1;
 
-    double alpha = priorVar.priorPars.at("alpha");
-    double lambda = priorVar.priorPars.at("lambda");
-
-    double taualpha = priorSkew.priorPars.at("tau");
+//    double alpha = priorVar.priorPars.at("alpha");
+//    double lambda = priorVar.priorPars.at("lambda");
+//
+//    double taualpha = priorSkew.priorPars.at("tau");
     double fixatanhalpha = -10000.0;
 
     FormatMsPriorsMargResult result{
@@ -188,10 +188,10 @@ FormatMsPriorsMargResult format_ms_priors_marg(const msPriorSpec &priorCoef, con
             priorgr,
             tau,
             taugroup,
-            alpha,
-            lambda,
-            taualpha,
-            fixatanhalpha,
+//            alpha,
+//            lambda,
+//            taualpha,
+//            fixatanhalpha,
             priorCoef,
             priorGroup
     };

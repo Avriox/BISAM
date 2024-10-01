@@ -44,49 +44,56 @@ Eigen::VectorXi model_selection_no_optimization(
     groups = group_info.groups;
 
     // Calculate column means and standard deviations
-    Eigen::VectorXd mx = x.cast<double>().colwise().mean();
-    Eigen::VectorXd mean_square = x.cast<double>().array().square().colwise().mean();
-    Eigen::VectorXd mx_squared = mx.array().square();
-    Eigen::VectorXd difference = mean_square - mx_squared;
-    Eigen::VectorXd sqrt_difference = difference.array().sqrt();
-    double correction_factor = std::sqrt(static_cast<double>(n) / (n - 1));
-    Eigen::VectorXd sx = sqrt_difference * correction_factor;
+//    Eigen::VectorXd mx = x.cast<double>().colwise().mean();
+//    Eigen::VectorXd mean_square = x.cast<double>().array().square().colwise().mean();
+//    Eigen::VectorXd mx_squared = mx.array().square();
+//    Eigen::VectorXd difference = mean_square - mx_squared;
+//    Eigen::VectorXd sqrt_difference = difference.array().sqrt();
+//    double correction_factor = std::sqrt(static_cast<double>(n) / (n - 1));
+//    Eigen::VectorXd sx = sqrt_difference * correction_factor;
 
     // Check for constant columns
-    Eigen::Array<bool, Eigen::Dynamic, 1> ct = (sx.array() == 0);
-    if (ct.cast<int>().sum() > 1) {
-        throw std::runtime_error("There are >1 constant columns in x (e.g. two intercepts)");
-    }
+//    Eigen::Array<bool, Eigen::Dynamic, 1> ct = (sx.array() == 0);
+//    if (ct.cast<int>().sum() > 1) {
+//        throw std::runtime_error("There are >1 constant columns in x (e.g. two intercepts)");
+//    }
 
-    double my = 0.0;
-    mx = Eigen::VectorXd::Zero(p);
-    double sy = 1.0;
-    sx = Eigen::VectorXd::Ones(p);
+//    double my = 0.0;
+    double my = y.mean();
+
+//    mx = Eigen::VectorXd::Zero(p);
+
+//    double sy = 1.0;
+    double variance = (y.array() - my).square().sum() / (y.size() - 1);
+    double sy = std::sqrt(variance);
+
+//    sx = Eigen::VectorXd::Ones(p);
 
     // Standardize y
     Eigen::VectorXd y_std = (y.array() - my) / sy;
 
     // Initialize xstd as a copy of x
+    //TODO copy not needed
     Eigen::MatrixXd x_std = x.cast<double>();
 
     // Create a vector of indices where !ct is true
-    Eigen::VectorXi non_constant_cols = (ct.array() == false).cast<int>();
-
-    // Perform the normalization for non-constant columns
-    for (int i = 0; i < p; ++i) {
-        if (non_constant_cols(i)) {
-            x_std.col(i) = (x_std.col(i).array() - mx(i)) / sx(i);
-        }
-    }
+//    Eigen::VectorXi non_constant_cols = (ct.array() == false).cast<int>();
+//
+//    // Perform the normalization for non-constant columns
+//    for (int i = 0; i < p; ++i) {
+//        if (non_constant_cols(i)) {
+//            x_std.col(i) = (x_std.col(i).array() - mx(i)) / sx(i);
+//        }
+//    }
 
     int known_phi = 1;
 
     // Create the stdconstants matrix
-    Eigen::MatrixXd std_constants(p + 1, 2);
-    std_constants(0, 0) = my;
-    std_constants(0, 1) = sy;
-    std_constants.block(1, 0, p, 1) = mx;
-    std_constants.block(1, 1, p, 1) = sx;
+//    Eigen::MatrixXd std_constants(p + 1, 2);
+//    std_constants(0, 0) = my;
+//    std_constants(0, 1) = sy;
+//    std_constants.block(1, 0, p, 1) = mx;
+//    std_constants.block(1, 1, p, 1) = sx;
 
     // Initialize delta_ini
 //    int delta_ini = 0;
@@ -109,23 +116,23 @@ Eigen::VectorXi model_selection_no_optimization(
     int family_greedy = f_family.second;
 
     // Initialize priors
-    msPriorSpec prior_var = igprior(0.01, 0.01);
-    msPriorSpec prior_skew = momprior(0.348);
+//    msPriorSpec prior_var = igprior(0.01, 0.01);
+//    msPriorSpec prior_skew = momprior(0.348);
     msPriorSpec prior_group = prior_coef;
     msPriorSpec prior_constraints = prior_delta;
 
     // Format priors
-    FormatMsPriorsMargResult tmp_pm = format_ms_priors_marg(prior_coef, prior_group, prior_var, prior_skew, n);
+    FormatMsPriorsMargResult tmp_pm = format_ms_priors_marg(prior_coef, prior_group,  n); // prior_var, prior_skew,
 
     int r = tmp_pm.r;
     int prior = tmp_pm.prior;
     int prior_gr = tmp_pm.priorgr;
     double tau = tmp_pm.tau;
     double tau_group = tmp_pm.taugroup;
-    double alpha = tmp_pm.alpha;
-    double lambda = tmp_pm.lambda;
-    double tau_alpha = tmp_pm.taualpha;
-    double fix_atanh_alpha = tmp_pm.fixatanhalpha;
+//    double alpha = tmp_pm.alpha;
+//    double lambda = tmp_pm.lambda;
+//    double tau_alpha = tmp_pm.taualpha;
+//    double fix_atanh_alpha = tmp_pm.fixatanhalpha;
     prior_coef = tmp_pm.priorCoef;
     prior_group = tmp_pm.priorGroup;
 
@@ -372,8 +379,8 @@ Eigen::VectorXi model_selection_no_optimization(
             prior_group,
             prior_delta,
             prior_constraints,
-            prior_var,
-            prior_skew
+//            prior_var,
+//            prior_skew
     };
 
     return post_sample;
