@@ -8,7 +8,7 @@
 
 #include <RcppEigen.h>
 // [[Rcpp::depends(RcppEigen)]]
-
+#include <Rcpp.h>
 
 // Standard library includes (common to both environments)
 #include <map>
