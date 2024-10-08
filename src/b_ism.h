@@ -23,7 +23,7 @@
 #include <iomanip>
 
 // Local includes (adjust paths as necessary)
-#include "./model_selection/ms_base.h"
+#include "ms_base.h"
 #include "./mombf/cstat.h"
 #include "./model_selection/ms_no_optimization.h"
 #include "./model_selection/ms_split_z.h"
