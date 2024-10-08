@@ -1,9 +1,11 @@
 #include "./ms_base.h"
 #include "../mombf/modselIntegrals.h"
 
+// [[Rcpp::export]]
 msPriorSpec::msPriorSpec(std::string priorType, std::string priorDistr, std::map<std::string, double> priorPars)
         : priorType(priorType), priorDistr(priorDistr), priorPars(priorPars) {}
 
+// [[Rcpp::export]]
 msPriorSpec imomprior(double tau, double tau_adj) {
     std::map<std::string, double> priorPars = {
             {"tau",     tau},
@@ -13,6 +15,7 @@ msPriorSpec imomprior(double tau, double tau_adj) {
     return msPriorSpec("coefficients", "piMOM", priorPars);
 }
 
+// [[Rcpp::export]]
 msPriorSpec modelbbprior(double alpha_p, double beta_p) {
     std::map<std::string, double> priorPars = {
             {"alpha.p", alpha_p},
@@ -22,6 +25,7 @@ msPriorSpec modelbbprior(double alpha_p, double beta_p) {
     return msPriorSpec("modelIndicator", "binomial", priorPars);
 }
 
+// [[Rcpp::export]]
 msPriorSpec igprior(double alpha, double lambda) {
     std::map<std::string, double> priorPars = {
             {"alpha",  alpha},
@@ -31,6 +35,7 @@ msPriorSpec igprior(double alpha, double lambda) {
     return msPriorSpec("nuisancePars", "invgamma", priorPars);
 }
 
+// [[Rcpp::export]]
 msPriorSpec momprior(double tau, double tau_adj, double r) {
     std::map<std::string, double> priorPars = {
             {"tau",     tau},

@@ -684,7 +684,7 @@ Rcpp::IntegerVector model_selection_wrapper(
         Rcpp::NumericVector y,
         Rcpp::IntegerMatrix x,
         int n_iter,
-        double tau_g,
+//        double tau_g,
 //        double va,
 //        double vb,
         msPriorSpec priorCoef,
