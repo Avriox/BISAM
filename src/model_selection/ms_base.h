@@ -54,6 +54,7 @@ struct FormatMsMethodResult {
     int hesstype;
 };
 
+// [[Rcpp::export]]
 class msPriorSpec {
 public:
     msPriorSpec(std::string priorType, std::string priorDistr, std::map<std::string, double> priorPars);
@@ -63,12 +64,16 @@ public:
     std::map<std::string, double> priorPars;
 };
 
+// [[Rcpp::export]]
 msPriorSpec imomprior(double tau, double tau_adj = 1e6);
 
+// [[Rcpp::export]]
 msPriorSpec modelbbprior(double alpha_p = 1.0, double beta_p = 1.0);
 
+// [[Rcpp::export]]
 msPriorSpec igprior(double alpha = 1.0, double lambda = 1.0);
 
+// [[Rcpp::export]]
 msPriorSpec momprior(double tau = 1.0, double tau_adj = 1e6, double r = 1);
 
 typedef std::vector<int *> intptrvec;

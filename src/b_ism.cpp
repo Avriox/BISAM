@@ -685,8 +685,10 @@ Rcpp::IntegerVector model_selection_wrapper(
         Rcpp::IntegerMatrix x,
         int n_iter,
         double tau_g,
-        double va,
-        double vb,
+//        double va,
+//        double vb,
+        msPriorSpec priorCoef,
+        msPriorSpec priorDelta,
         double phi,
         Rcpp::IntegerVector w_i,
         int n_observations,
@@ -700,8 +702,8 @@ Rcpp::IntegerVector model_selection_wrapper(
         Eigen::VectorXi w_i_eigen = Rcpp::as<Eigen::VectorXi>(w_i);
 
         // Create prior specifications
-        msPriorSpec priorCoef = imomprior(tau_g);
-        msPriorSpec priorDelta = modelbbprior(va, vb);
+//        msPriorSpec priorCoef = imomprior(tau_g);
+//        msPriorSpec priorDelta = modelbbprior(va, vb);
 
         if (optimization_methode == "No Optimization") {
 //            std::cout << "Running with model_selection: 'No Optimization'" << std::endl;
