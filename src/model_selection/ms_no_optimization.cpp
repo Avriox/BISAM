@@ -66,29 +66,29 @@ Eigen::VectorXi model_selection_no_optimization(
 
 
         // Calculate column means and standard deviations
-        Eigen::VectorXd mx = x.cast<double>().colwise().mean();
-        Eigen::VectorXd mean_square = x.cast<double>().array().square().colwise().mean();
-        Eigen::VectorXd mx_squared = mx.array().square();
-        Eigen::VectorXd difference = mean_square - mx_squared;
-        Eigen::VectorXd sqrt_difference = difference.array().sqrt();
-        double correction_factor = std::sqrt(static_cast<double>(n) / (n - 1));
-        Eigen::VectorXd sx = sqrt_difference * correction_factor;
-
-        // Check for constant columns
-        Eigen::Array<bool, Eigen::Dynamic, 1> ct = (sx.array() == 0);
-        if (ct.cast<int>().sum() > 1) {
-            throw std::runtime_error("There are >1 constant columns in x (e.g. two intercepts)");
-        }
-
-        // Create a vector of indices where !ct is true
-        Eigen::VectorXi non_constant_cols = (ct.array() == false).cast<int>();
-
-        // Perform the normalization for non-constant columns
-        for (int i = 0; i < p; ++i) {
-            if (non_constant_cols(i)) {
-                x_std.col(i) = (x_std.col(i).array() - mx(i)) / sx(i);
-            }
-        }
+//        Eigen::VectorXd mx = x.cast<double>().colwise().mean();
+//        Eigen::VectorXd mean_square = x.cast<double>().array().square().colwise().mean();
+//        Eigen::VectorXd mx_squared = mx.array().square();
+//        Eigen::VectorXd difference = mean_square - mx_squared;
+//        Eigen::VectorXd sqrt_difference = difference.array().sqrt();
+//        double correction_factor = std::sqrt(static_cast<double>(n) / (n - 1));
+//        Eigen::VectorXd sx = sqrt_difference * correction_factor;
+//
+//        // Check for constant columns
+//        Eigen::Array<bool, Eigen::Dynamic, 1> ct = (sx.array() == 0);
+//        if (ct.cast<int>().sum() > 1) {
+//            throw std::runtime_error("There are >1 constant columns in x (e.g. two intercepts)");
+//        }
+//
+//        // Create a vector of indices where !ct is true
+//        Eigen::VectorXi non_constant_cols = (ct.array() == false).cast<int>();
+//
+//        // Perform the normalization for non-constant columns
+//        for (int i = 0; i < p; ++i) {
+//            if (non_constant_cols(i)) {
+//                x_std.col(i) = (x_std.col(i).array() - mx(i)) / sx(i);
+//            }
+//        }
 
     }
 
