@@ -13,19 +13,19 @@ model_selection_wrapper <- function(y, x, n_iter, tau_g, va, vb, priorCoef, prio
     .Call(`_BISAM_model_selection_wrapper`, y, x, n_iter, tau_g, va, vb, priorCoef, priorDelta, phi, w_i, n_observations, n_timeperiods, optimization_methode)
 }
 
-imomprior <- function(tau, tau_adj) {
+imomprior <- function(tau, tau_adj = 1e6) {
     .Call(`_BISAM_imomprior`, tau, tau_adj)
 }
 
-modelbbprior <- function(alpha_p, beta_p) {
+modelbbprior <- function(alpha_p = 1.0, beta_p = 1.0) {
     .Call(`_BISAM_modelbbprior`, alpha_p, beta_p)
 }
 
-igprior <- function(alpha, lambda) {
+igprior <- function(alpha = 1.0, lambda = 1.0) {
     .Call(`_BISAM_igprior`, alpha, lambda)
 }
 
-momprior <- function(tau, tau_adj, r) {
+momprior <- function(tau = 1.0, tau_adj = 1e6, r = 1) {
     .Call(`_BISAM_momprior`, tau, tau_adj, r)
 }
 
