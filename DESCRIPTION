@@ -1,7 +1,7 @@
 Package: BISAM
 Type: Package
 Title: What the Package Does (One Line, Title Case)
-Version: 0.0.5
+Version: 0.0.6
 Date: 2024-09-19
 Author: Jakob Goldmann
 Maintainer: Jakob Goldmann <your.email@example.com>
