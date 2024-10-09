@@ -29,7 +29,8 @@ Eigen::VectorXi model_selection_no_optimization(
         double phi,
         Eigen::VectorXi w_i,
         int n_observations,
-        int n_timeperiods
+        int n_timeperiods,
+        bool standardize
 );
 
 #endif //CPP_MS_NO_OPTIMIZATION_H

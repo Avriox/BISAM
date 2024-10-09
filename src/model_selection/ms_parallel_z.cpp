@@ -20,7 +20,7 @@ void worker(SafeQueue<Task> &task_queue,
         results[task.index] = model_selection_no_optimization(
                 task.y, task.x, n_iter,
                 prior_coef, prior_delta, phi, task.wi,
-                n_observations, n_timeperiods);
+                n_observations, n_timeperiods, task.standardize);
         completed_tasks++;
     }
 }
@@ -37,7 +37,8 @@ Eigen::VectorXi model_selection_parallel_z(
         double phi,
         Eigen::VectorXi w_i,
         int n_observations,
-        int n_timeperiods) {
+        int n_timeperiods,
+        bool standardize) {
 
     std::vector<Eigen::MatrixXi> split_xs = splitMatrix(x, n_timeperiods, n_observations);
     std::vector<Eigen::VectorXd> split_ys = splitVector(y, n_timeperiods);
@@ -50,7 +51,7 @@ Eigen::VectorXi model_selection_parallel_z(
     for (int i = 0; i < num_segments; ++i) {
         auto task = std::make_shared<Task>(Task{
                 i, std::move(split_xs[i]), std::move(split_ys[i]), std::move(split_wis[i]),
-                n_iter, &prior_coef, &prior_delta, phi, n_observations, n_timeperiods
+                n_iter, &prior_coef, &prior_delta, phi, n_observations, n_timeperiods, standardize
         });
         futures[i] = global_thread_pool.add_task(std::move(task));
     }

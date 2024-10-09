@@ -15,7 +15,8 @@ Eigen::VectorXi model_selection_no_optimization(
         double phi,
         Eigen::VectorXi w_i,
         int n_observations,
-        int n_timeperiods
+        int n_timeperiods,
+        bool standardiuze
 ) {
 
 
@@ -59,18 +60,23 @@ Eigen::VectorXi model_selection_no_optimization(
 //    }
 
 //    double my = 0.0;
-    double my = y.mean();
+
+    Eigen::VectorXd y_std = y;
+
+    if (standardiuze) {
+        double my = y.mean();
 
 //    mx = Eigen::VectorXd::Zero(p);
 
 //    double sy = 1.0;
-    double variance = (y.array() - my).square().sum() / (y.size() - 1);
-    double sy = std::sqrt(variance);
+        double variance = (y.array() - my).square().sum() / (y.size() - 1);
+        double sy = std::sqrt(variance);
 
 //    sx = Eigen::VectorXd::Ones(p);
 
-    // Standardize y
-    Eigen::VectorXd y_std = (y.array() - my) / sy;
+        // Standardize y
+        y_std = (y.array() - my) / sy;
+    }
 
     // Initialize xstd as a copy of x
     //TODO copy not needed

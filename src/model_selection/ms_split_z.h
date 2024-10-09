@@ -26,7 +26,8 @@ Eigen::VectorXi model_selection_split_z(
         double phi,
         Eigen::VectorXi w_i,
         int n_observations,
-        int n_timeperiods
+        int n_timeperiods,
+        bool standardize
 );
 
 

@@ -343,7 +343,8 @@ void b_ism(
     // All of them HAVE TO take the same parameters and return the same type!
     // Using std::function to store the selected function
     std::function<Eigen::VectorXi(Eigen::VectorXd, Eigen::MatrixXi, int, msPriorSpec, msPriorSpec,
-                                  double, Eigen::VectorXi, int n_observations, int n_timeperiods)> model_selection;
+                                  double, Eigen::VectorXi, int n_observations, int n_timeperiods,
+                                  bool standardize)> model_selection;
 
 
     switch (model_selection_version) {
@@ -465,7 +466,7 @@ void b_ism(
 
         // Use the correct version of model selection as defined earlier
         // TODO I am not 100% sure that col_idx is correct for n_observations
-        w_i = model_selection(y_hat, Z, 2, priorCoef, priorDelta, s2_i, w_i, col_idx, t);
+        w_i = model_selection(y_hat, Z, 2, priorCoef, priorDelta, s2_i, w_i, col_idx, t, false);
 
         timer.end_section("Model selection");
 
@@ -690,7 +691,8 @@ Rcpp::IntegerVector model_selection_wrapper(
         Rcpp::IntegerVector w_i,
         int n_observations,
         int n_timeperiods,
-        std::string optimization_methode
+        std::string optimization_methode,
+        bool standardize
 ) {
     try {
         // Convert R types to Eigen types
@@ -711,7 +713,7 @@ Rcpp::IntegerVector model_selection_wrapper(
             // Call the C++ function
             Eigen::VectorXi result = model_selection_no_optimization(
                     y_eigen, x_eigen, n_iter, priorCoef_cpp, priorDelta_cpp, phi,
-                    w_i_eigen, n_observations, n_timeperiods
+                    w_i_eigen, n_observations, n_timeperiods, standardize
             );
 
             // Convert the result back to R type
@@ -723,7 +725,7 @@ Rcpp::IntegerVector model_selection_wrapper(
             // Call the C++ function
             Eigen::VectorXi result = model_selection_split_z(
                     y_eigen, x_eigen, n_iter, priorCoef_cpp, priorDelta_cpp, phi,
-                    w_i_eigen, n_observations, n_timeperiods
+                    w_i_eigen, n_observations, n_timeperiods, standardize
             );
 
             // Convert the result back to R type
@@ -735,7 +737,7 @@ Rcpp::IntegerVector model_selection_wrapper(
             // Call the C++ function
             Eigen::VectorXi result = model_selection_parallel_z(
                     y_eigen, x_eigen, n_iter, priorCoef_cpp, priorDelta_cpp, phi,
-                    w_i_eigen, n_observations, n_timeperiods
+                    w_i_eigen, n_observations, n_timeperiods, standardize
             );
 
             // Convert the result back to R type
@@ -747,7 +749,7 @@ Rcpp::IntegerVector model_selection_wrapper(
             // Call the C++ function
             Eigen::VectorXi result = model_selection_no_optimization(
                     y_eigen, x_eigen, n_iter, priorCoef_cpp, priorDelta_cpp, phi,
-                    w_i_eigen, n_observations, n_timeperiods
+                    w_i_eigen, n_observations, n_timeperiods, standardize
             );
 
             // Convert the result back to R type

@@ -58,8 +58,8 @@ Eigen::VectorXi model_selection_split_z(
         double phi,
         Eigen::VectorXi w_i,
         int n_observations,
-        int n_timeperiods
-) {
+        int n_timeperiods,
+        bool standardize) {
 
 
 
@@ -81,7 +81,8 @@ Eigen::VectorXi model_selection_split_z(
         Eigen::VectorXi split_wi = split_wis[i];
 
         Eigen::MatrixXi post_sample = model_selection_no_optimization(split_y, split_x, n_iter, prior_coef, prior_delta,
-                                                                      phi, split_wi, n_observations, n_timeperiods);
+                                                                      phi, split_wi, n_observations, n_timeperiods,
+                                                                      standardize);
 
         post_samples.segment(n_observations * i, n_observations) = post_sample;
 

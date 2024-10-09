@@ -30,7 +30,8 @@ Eigen::VectorXi model_selection_parallel_z(
         double phi,
         Eigen::VectorXi w_i,
         int n_observations,
-        int n_timeperiods
+        int n_timeperiods,
+        bool standardize
 );
 
 struct Task {
@@ -44,6 +45,7 @@ struct Task {
     double phi;
     int n_observations;
     int n_timeperiods;
+    bool standardize;
     std::promise<Eigen::MatrixXi> result_promise;
 };
 
@@ -78,7 +80,7 @@ private:
             Eigen::MatrixXi result = model_selection_no_optimization(
                     task->y, task->x, task->n_iter,
                     *(task->prior_coef), *(task->prior_delta), task->phi, task->wi,
-                    task->n_observations, task->n_timeperiods);
+                    task->n_observations, task->n_timeperiods, task->standardize);
             task->result_promise.set_value(std::move(result));
         }
     }
