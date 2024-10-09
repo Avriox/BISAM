@@ -16,7 +16,7 @@ Eigen::VectorXi model_selection_no_optimization(
         Eigen::VectorXi w_i,
         int n_observations,
         int n_timeperiods,
-        bool standardiuze
+        bool standardize
 ) {
 
 
@@ -44,53 +44,54 @@ Eigen::VectorXi model_selection_no_optimization(
     Eigen::VectorXi n_var_in_group = group_info.nvaringroup;
     groups = group_info.groups;
 
-    // Calculate column means and standard deviations
-//    Eigen::VectorXd mx = x.cast<double>().colwise().mean();
-//    Eigen::VectorXd mean_square = x.cast<double>().array().square().colwise().mean();
-//    Eigen::VectorXd mx_squared = mx.array().square();
-//    Eigen::VectorXd difference = mean_square - mx_squared;
-//    Eigen::VectorXd sqrt_difference = difference.array().sqrt();
-//    double correction_factor = std::sqrt(static_cast<double>(n) / (n - 1));
-//    Eigen::VectorXd sx = sqrt_difference * correction_factor;
 
-    // Check for constant columns
-//    Eigen::Array<bool, Eigen::Dynamic, 1> ct = (sx.array() == 0);
-//    if (ct.cast<int>().sum() > 1) {
-//        throw std::runtime_error("There are >1 constant columns in x (e.g. two intercepts)");
-//    }
+
+
 
 //    double my = 0.0;
 
     Eigen::VectorXd y_std = y;
+    Eigen::MatrixXd x_std = x.cast<double>();
 
-    if (standardiuze) {
+    if (standardize) {
         double my = y.mean();
 
-//    mx = Eigen::VectorXd::Zero(p);
 
-//    double sy = 1.0;
-        double variance = (y.array() - my).square().sum() / (y.size() - 1);
-        double sy = std::sqrt(variance);
+        double variance_y = (y.array() - my).square().sum() / (y.size() - 1);
+        double sy = std::sqrt(variance_y);
 
-//    sx = Eigen::VectorXd::Ones(p);
 
         // Standardize y
         y_std = (y.array() - my) / sy;
+
+
+        // Calculate column means and standard deviations
+        Eigen::VectorXd mx = x.cast<double>().colwise().mean();
+        Eigen::VectorXd mean_square = x.cast<double>().array().square().colwise().mean();
+        Eigen::VectorXd mx_squared = mx.array().square();
+        Eigen::VectorXd difference = mean_square - mx_squared;
+        Eigen::VectorXd sqrt_difference = difference.array().sqrt();
+        double correction_factor = std::sqrt(static_cast<double>(n) / (n - 1));
+        Eigen::VectorXd sx = sqrt_difference * correction_factor;
+
+        // Check for constant columns
+        Eigen::Array<bool, Eigen::Dynamic, 1> ct = (sx.array() == 0);
+        if (ct.cast<int>().sum() > 1) {
+            throw std::runtime_error("There are >1 constant columns in x (e.g. two intercepts)");
+        }
+
+        // Create a vector of indices where !ct is true
+        Eigen::VectorXi non_constant_cols = (ct.array() == false).cast<int>();
+
+        // Perform the normalization for non-constant columns
+        for (int i = 0; i < p; ++i) {
+            if (non_constant_cols(i)) {
+                x_std.col(i) = (x_std.col(i).array() - mx(i)) / sx(i);
+            }
+        }
+
     }
 
-    // Initialize xstd as a copy of x
-    //TODO copy not needed
-    Eigen::MatrixXd x_std = x.cast<double>();
-
-    // Create a vector of indices where !ct is true
-//    Eigen::VectorXi non_constant_cols = (ct.array() == false).cast<int>();
-//
-//    // Perform the normalization for non-constant columns
-//    for (int i = 0; i < p; ++i) {
-//        if (non_constant_cols(i)) {
-//            x_std.col(i) = (x_std.col(i).array() - mx(i)) / sx(i);
-//        }
-//    }
 
     int known_phi = 1;
 
