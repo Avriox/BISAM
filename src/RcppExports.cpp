@@ -64,24 +64,21 @@ RcppExport SEXP _BISAM_rnlp_wrapper(SEXP niterSEXP, SEXP burninSEXP, SEXP thinni
 }
 // model_selection_wrapper
 Rcpp::IntegerVector model_selection_wrapper(Rcpp::NumericVector y, Rcpp::IntegerMatrix x, int n_iter, Rcpp::List priorCoef, Rcpp::List priorDelta, double phi, Rcpp::IntegerVector w_i, int n_observations, int n_timeperiods, std::string optimization_methode);
-RcppExport SEXP _BISAM_model_selection_wrapper(SEXP ySEXP, SEXP xSEXP, SEXP n_iterSEXP, SEXP tau_gSEXP, SEXP vaSEXP, SEXP vbSEXP, SEXP priorCoefSEXP, SEXP priorDeltaSEXP, SEXP phiSEXP, SEXP w_iSEXP, SEXP n_observationsSEXP, SEXP n_timeperiodsSEXP, SEXP optimization_methodeSEXP) {
+RcppExport SEXP _BISAM_model_selection_wrapper(SEXP ySEXP, SEXP xSEXP, SEXP n_iterSEXP, SEXP priorCoefSEXP, SEXP priorDeltaSEXP, SEXP phiSEXP, SEXP w_iSEXP, SEXP n_observationsSEXP, SEXP n_timeperiodsSEXP, SEXP optimization_methodeSEXP) {
     BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter<Rcpp::NumericVector>::type y(ySEXP);
     Rcpp::traits::input_parameter<Rcpp::IntegerMatrix>::type x(xSEXP);
     Rcpp::traits::input_parameter<int>::type n_iter(n_iterSEXP);
-    Rcpp::traits::input_parameter <      //        double >::type tau_g(tau_gSEXP);
-        Rcpp::traits::input_parameter <  //        double >::type va(vaSEXP);
-        Rcpp::traits::input_parameter <  //        double >::type vb(vbSEXP);
-        Rcpp::traits::input_parameter<Rcpp::List>::type priorCoef(priorCoefSEXP);
+    Rcpp::traits::input_parameter<Rcpp::List>::type priorCoef(priorCoefSEXP);
     Rcpp::traits::input_parameter<Rcpp::List>::type priorDelta(priorDeltaSEXP);
     Rcpp::traits::input_parameter<double>::type phi(phiSEXP);
     Rcpp::traits::input_parameter<Rcpp::IntegerVector>::type w_i(w_iSEXP);
     Rcpp::traits::input_parameter<int>::type n_observations(n_observationsSEXP);
     Rcpp::traits::input_parameter<int>::type n_timeperiods(n_timeperiodsSEXP);
     Rcpp::traits::input_parameter<std::string>::type optimization_methode(optimization_methodeSEXP);
-    rcpp_result_gen = Rcpp::wrap(model_selection_wrapper(y, x, n_iter, tau_g, va, vb, priorCoef, priorDelta, phi, w_i, n_observations, n_timeperiods, optimization_methode));
+    rcpp_result_gen = Rcpp::wrap(model_selection_wrapper(y, x, n_iter, priorCoef, priorDelta, phi, w_i, n_observations, n_timeperiods, optimization_methode));
     return rcpp_result_gen;
     END_RCPP
 }
@@ -138,7 +135,7 @@ RcppExport SEXP _BISAM_momprior(SEXP tauSEXP, SEXP tau_adjSEXP, SEXP rSEXP) {
 static const R_CallMethodDef CallEntries[] = {
     {"_BISAM_b_ism_wrapper", (DL_FUNC)&_BISAM_b_ism_wrapper, 20},
     {"_BISAM_rnlp_wrapper", (DL_FUNC)&_BISAM_rnlp_wrapper, 11},
-    {"_BISAM_model_selection_wrapper", (DL_FUNC)&_BISAM_model_selection_wrapper, 13},
+    {"_BISAM_model_selection_wrapper", (DL_FUNC)&_BISAM_model_selection_wrapper, 10},
     {"_BISAM_imomprior", (DL_FUNC)&_BISAM_imomprior, 2},
     {"_BISAM_modelbbprior", (DL_FUNC)&_BISAM_modelbbprior, 2},
     {"_BISAM_igprior", (DL_FUNC)&_BISAM_igprior, 2},
