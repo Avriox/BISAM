@@ -453,9 +453,9 @@ void b_ism(
         Eigen::VectorXd y_hat = y - X * b_i;
 
         // ausm loop
-        msPriorSpec priorCoef = imomprior(tau_g);
+        msPriorSpec priorCoef = imomprior_cpp(tau_g);
 
-        msPriorSpec priorDelta = modelbbprior(va, vb);
+        msPriorSpec priorDelta = modelbbprior_cpp(va, vb);
 
 
 //        std::cout << "Z:" << std::endl << Z << std::endl << std::endl;
@@ -687,8 +687,8 @@ Rcpp::IntegerVector model_selection_wrapper(
 //        double tau_g,
 //        double va,
 //        double vb,
-        msPriorSpec priorCoef,
-        msPriorSpec priorDelta,
+        Rcpp::List priorCoef,
+        Rcpp::List priorDelta,
         double phi,
         Rcpp::IntegerVector w_i,
         int n_observations,
@@ -702,14 +702,18 @@ Rcpp::IntegerVector model_selection_wrapper(
         Eigen::VectorXi w_i_eigen = Rcpp::as<Eigen::VectorXi>(w_i);
 
         // Create prior specifications
-//        msPriorSpec priorCoef = imomprior(tau_g);
-//        msPriorSpec priorDelta = modelbbprior(va, vb);
+//        msPriorSpec priorCoef = imomprior_cpp(tau_g);
+//        msPriorSpec priorDelta = modelbbprior_cpp(va, vb);
+
+        // Convert Rcpp::List to msPriorSpec objects
+        msPriorSpec priorCoef_cpp = list_to_msPriorSpec(priorCoef);
+        msPriorSpec priorDelta_cpp = list_to_msPriorSpec(priorDelta);
 
         if (optimization_methode == "No Optimization") {
 //            std::cout << "Running with model_selection: 'No Optimization'" << std::endl;
             // Call the C++ function
             Eigen::VectorXi result = model_selection_no_optimization(
-                    y_eigen, x_eigen, n_iter, priorCoef, priorDelta, phi,
+                    y_eigen, x_eigen, n_iter, priorCoef_cpp, priorDelta_cpp, phi,
                     w_i_eigen, n_observations, n_timeperiods
             );
 
@@ -721,7 +725,7 @@ Rcpp::IntegerVector model_selection_wrapper(
 
             // Call the C++ function
             Eigen::VectorXi result = model_selection_split_z(
-                    y_eigen, x_eigen, n_iter, priorCoef, priorDelta, phi,
+                    y_eigen, x_eigen, n_iter, priorCoef_cpp, priorDelta_cpp, phi,
                     w_i_eigen, n_observations, n_timeperiods
             );
 
@@ -733,7 +737,7 @@ Rcpp::IntegerVector model_selection_wrapper(
 
             // Call the C++ function
             Eigen::VectorXi result = model_selection_parallel_z(
-                    y_eigen, x_eigen, n_iter, priorCoef, priorDelta, phi,
+                    y_eigen, x_eigen, n_iter, priorCoef_cpp, priorDelta_cpp, phi,
                     w_i_eigen, n_observations, n_timeperiods
             );
 
@@ -745,7 +749,7 @@ Rcpp::IntegerVector model_selection_wrapper(
 
             // Call the C++ function
             Eigen::VectorXi result = model_selection_no_optimization(
-                    y_eigen, x_eigen, n_iter, priorCoef, priorDelta, phi,
+                    y_eigen, x_eigen, n_iter, priorCoef_cpp, priorDelta_cpp, phi,
                     w_i_eigen, n_observations, n_timeperiods
             );
 

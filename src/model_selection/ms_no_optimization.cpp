@@ -116,13 +116,13 @@ Eigen::VectorXi model_selection_no_optimization(
     int family_greedy = f_family.second;
 
     // Initialize priors
-//    msPriorSpec prior_var = igprior(0.01, 0.01);
-//    msPriorSpec prior_skew = momprior(0.348);
+//    msPriorSpec prior_var = igprior_cpp(0.01, 0.01);
+//    msPriorSpec prior_skew = momprior_cpp(0.348);
     msPriorSpec prior_group = prior_coef;
     msPriorSpec prior_constraints = prior_delta;
 
     // Format priors
-    FormatMsPriorsMargResult tmp_pm = format_ms_priors_marg(prior_coef, prior_group,  n); // prior_var, prior_skew,
+    FormatMsPriorsMargResult tmp_pm = format_ms_priors_marg(prior_coef, prior_group, n); // prior_var, prior_skew,
 
     int r = tmp_pm.r;
     int prior = tmp_pm.prior;

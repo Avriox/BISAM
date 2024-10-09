@@ -1,12 +1,37 @@
 #include "./ms_base.h"
 #include "mombf/modselIntegrals.h"
 
+using namespace Rcpp;
+
 // [[Rcpp::export]]
 msPriorSpec::msPriorSpec(std::string priorType, std::string priorDistr, std::map<std::string, double> priorPars)
         : priorType(priorType), priorDistr(priorDistr), priorPars(priorPars) {}
 
-// [[Rcpp::export]]
-msPriorSpec imomprior(double tau, double tau_adj) {
+// Convert msPriorSpec to R list
+List msPriorSpec_to_list(const msPriorSpec &obj) {
+    return List::create(
+            _["priorType"] = obj.priorType,
+            _["priorDistr"] = obj.priorDistr,
+            _["priorPars"] = wrap(obj.priorPars)
+    );
+}
+
+// Convert R list to msPriorSpec
+msPriorSpec list_to_msPriorSpec(List lst) {
+    std::string priorType = as<std::string>(lst["priorType"]);
+    std::string priorDistr = as<std::string>(lst["priorDistr"]);
+    std::map<std::string, double> priorPars;
+    List pars = lst["priorPars"];
+    CharacterVector names = pars.names();
+    for (int i = 0; i < pars.size(); i++) {
+        std::string name = as<std::string>(names[i]);
+        double value = as<double>(pars[i]);
+        priorPars[name] = value;
+    }
+    return msPriorSpec(priorType, priorDistr, priorPars);
+}
+
+msPriorSpec imomprior_cpp(double tau, double tau_adj) {
     std::map<std::string, double> priorPars = {
             {"tau",     tau},
             {"tau.adj", tau_adj}
@@ -15,8 +40,8 @@ msPriorSpec imomprior(double tau, double tau_adj) {
     return msPriorSpec("coefficients", "piMOM", priorPars);
 }
 
-// [[Rcpp::export]]
-msPriorSpec modelbbprior(double alpha_p, double beta_p) {
+
+msPriorSpec modelbbprior_cpp(double alpha_p, double beta_p) {
     std::map<std::string, double> priorPars = {
             {"alpha.p", alpha_p},
             {"beta.p",  beta_p}
@@ -25,8 +50,7 @@ msPriorSpec modelbbprior(double alpha_p, double beta_p) {
     return msPriorSpec("modelIndicator", "binomial", priorPars);
 }
 
-// [[Rcpp::export]]
-msPriorSpec igprior(double alpha, double lambda) {
+msPriorSpec igprior_cpp(double alpha, double lambda) {
     std::map<std::string, double> priorPars = {
             {"alpha",  alpha},
             {"lambda", lambda}
@@ -35,8 +59,7 @@ msPriorSpec igprior(double alpha, double lambda) {
     return msPriorSpec("nuisancePars", "invgamma", priorPars);
 }
 
-// [[Rcpp::export]]
-msPriorSpec momprior(double tau, double tau_adj, double r) {
+msPriorSpec momprior_cpp(double tau, double tau_adj, double r) {
     std::map<std::string, double> priorPars = {
             {"tau",     tau},
             {"tau_adj", tau_adj},
@@ -44,6 +67,27 @@ msPriorSpec momprior(double tau, double tau_adj, double r) {
     };
 
     return msPriorSpec("nuisancePars", "invgamma", priorPars);
+}
+
+// R-exportable versions
+// [[Rcpp::export]]
+List imomprior(double tau, double tau_adj = 1e6) {
+    return msPriorSpec_to_list(imomprior_cpp(tau, tau_adj));
+}
+
+// [[Rcpp::export]]
+List modelbbprior(double alpha_p = 1.0, double beta_p = 1.0) {
+    return msPriorSpec_to_list(modelbbprior_cpp(alpha_p, beta_p));
+}
+
+// [[Rcpp::export]]
+List igprior(double alpha = 1.0, double lambda = 1.0) {
+    return msPriorSpec_to_list(igprior_cpp(alpha, lambda));
+}
+
+// [[Rcpp::export]]
+List momprior(double tau = 1.0, double tau_adj = 1e6, double r = 1) {
+    return msPriorSpec_to_list(momprior_cpp(tau, tau_adj, r));
 }
 
 
@@ -171,7 +215,7 @@ std::pair<int, int> get_family_info(const std::string &family, bool issurvival) 
 
 
 FormatMsPriorsMargResult format_ms_priors_marg(const msPriorSpec &priorCoef, const msPriorSpec &priorGroup,
-                                                int n) { // const msPriorSpec &priorVar, const msPriorSpec &priorSkew,
+                                               int n) { // const msPriorSpec &priorVar, const msPriorSpec &priorSkew,
 
     int r = 1;
 
