@@ -5,7 +5,7 @@
 #ifndef CPP_MS_SPLIT_Z_H
 #define CPP_MS_SPLIT_Z_H
 
-#include "./ms_base.h"
+#include "../ms_base.h"
 #include "../mombf/modselIntegrals.h"
 #include "./ms_no_optimization.h"
 

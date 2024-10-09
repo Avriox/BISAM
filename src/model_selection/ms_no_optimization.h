@@ -16,7 +16,7 @@
 #include <stdexcept>
 
 // Local includes
-#include "./ms_base.h"
+#include "../ms_base.h"
 #include "../mombf/modselIntegrals.h"
 
 // Different model selection functions:

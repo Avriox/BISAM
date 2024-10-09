@@ -3,7 +3,6 @@
 
 using namespace Rcpp;
 
-// [[Rcpp::export]]
 msPriorSpec::msPriorSpec(std::string priorType, std::string priorDistr, std::map<std::string, double> priorPars)
         : priorType(priorType), priorDistr(priorDistr), priorPars(priorPars) {}
 

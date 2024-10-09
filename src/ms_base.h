@@ -23,7 +23,7 @@
 #include <memory>
 
 // Local includes
-#include "./sel2selnew_optimization.h"
+#include "model_selection/sel2selnew_optimization.h"
 
 struct ModelSelectionResult {
     Eigen::VectorXi post_sample;
