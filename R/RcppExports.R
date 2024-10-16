@@ -21,6 +21,10 @@ modelbbprior <- function(alpha_p = 1.0, beta_p = 1.0) {
     .Call(`_BISAM_modelbbprior`, alpha_p, beta_p)
 }
 
+modelbinomprior <- function(p = 0.5) {
+    .Call(`_BISAM_modelbinomprior`, p)
+}
+
 igprior <- function(alpha = 1.0, lambda = 1.0) {
     .Call(`_BISAM_igprior`, alpha, lambda)
 }
