@@ -33,7 +33,7 @@ typedef std::vector<int *> intptrvec; //vector where each element is a pointer t
 // Structure containing parameters needed to calculate the integrated likelihood
 struct marginalPars {
 //    int *family;
-//    int *priorcode;
+    int *priorcode;
     int *sel;
     int *nsel;
     int *n;        //number of observations
@@ -70,9 +70,9 @@ struct marginalPars {
 //    double *taualpha; //dispersion parameter in prior for asymmetry parameter in two-piece Normal or two-piece Laplace residuals
 //    double *fixatanhalpha; //fixed value for asymmetry parameter (usedful for quantile regression at fixed quantile levels)
     int *r;           //MOM power parameter for prior on coefficients
-//    double *prDeltap; //For Binomial prior on model space, prDeltap is the prob of success. For complexity prior, the power parameter in the exponential
+    double *prDeltap; //For Binomial prior on model space, prDeltap is the prob of success. For complexity prior, the power parameter in the exponential
     double *parprDeltap; //For Beta-Binomial prior on model space, parprDeltap[0],parprDeltap[1] are the prior parameters
-//    double *prConstrp; //idem for prior on number of included groups under hierarchical constraints
+    double *prConstrp; //idem for prior on number of included groups under hierarchical constraints
     double *parprConstrp;
     int *logscale;
 //    double *offset;
@@ -124,6 +124,7 @@ nselConstraints(int *ngroups0, int *ngroups1, int *sel, int *nsel, int *group, i
 
 double betabinPrior(int *sel, int *nsel, struct marginalPars *pars);
 
+double binomPrior(int *sel, int *nsel, struct marginalPars *pars);
 
 // pMOM on all coef
 // TODO remove?

@@ -72,6 +72,8 @@ msPriorSpec imomprior_cpp(double tau, double tau_adj = 1e6);
 
 msPriorSpec modelbbprior_cpp(double alpha_p = 1.0, double beta_p = 1.0);
 
+msPriorSpec modelbinomprior_cpp(double p);
+
 msPriorSpec igprior_cpp(double alpha = 1.0, double lambda = 1.0);
 
 msPriorSpec momprior_cpp(double tau = 1.0, double tau_adj = 1e6, double r = 1);

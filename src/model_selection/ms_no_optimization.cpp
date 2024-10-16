@@ -145,13 +145,40 @@ Eigen::VectorXi model_selection_no_optimization(
 
     int pr_delta = 2;
     double pr_delta_p = 0.5;
-    std::vector<double> par_pr_delta_p = {prior_delta.priorPars.at("alpha.p"), prior_delta.priorPars.at("beta.p")};
+
+    enum PriorType {
+        modelbbprior,
+        modelbinomprior
+    };
+
+    // I absolutely hate this
+    PriorType prior_type;
+    std::vector<double> par_pr_delta_p;
+    if (prior_delta.priorType == "modelIndicator" && prior_delta.priorDistr == "binomial" &&
+        prior_delta.priorPars.size() == 2) {
+        // If Pars has 2 arguments = modelbbprior
+        par_pr_delta_p = {prior_delta.priorPars.at("alpha.p"), prior_delta.priorPars.at("beta.p")};
+        prior_type = PriorType::modelbbprior;
+    } else if (prior_delta.priorType == "modelIndicator" && prior_delta.priorDistr == "binomial" &&
+               prior_delta.priorPars.size() == 1) {
+        // If pars has 1 argument = modelbinomprior
+        par_pr_delta_p = {prior_delta.priorPars.at("p")};
+        prior_type = PriorType::modelbinomprior;
+    }
+
 
     int pr_constr = 2;
     double pr_constr_p = 0.5;
-    std::vector<double> par_pr_constr_p = {prior_constraints.priorPars.at("alpha.p"),
-                                           prior_constraints.priorPars.at("beta.p")};
 
+    std::vector<double> par_pr_constr_p;
+    if (prior_constraints.priorType == "modelIndicator" && prior_constraints.priorDistr == "binomial" &&
+        prior_constraints.priorPars.size() == 2) {
+        par_pr_constr_p = {prior_constraints.priorPars.at("alpha.p"),
+                           prior_constraints.priorPars.at("beta.p")};
+    } else if (prior_constraints.priorType == "modelIndicator" && prior_constraints.priorDistr == "binomial" &&
+               prior_constraints.priorPars.size() == 1) {
+        par_pr_constr_p = {prior_constraints.priorPars.at("p")};
+    }
     // Convert include_vars to int
     Eigen::VectorXi include_vars_int = include_vars.cast<int>();
 
@@ -231,6 +258,13 @@ Eigen::VectorXi model_selection_no_optimization(
     pars.nvaringroup = n_var_in_group.data();
     pars.nconstraints = n_constraints.data();
 
+    if (prior_type == PriorType::modelbinomprior) {
+        pars.prDeltap = &prior_delta.priorPars.at("p");
+        pars.prConstrp = &prior_delta.priorPars.at("p");
+    }
+
+//    int prior_code = mspriorCode(prior_coef, prior_group, &pars);
+
 
     int verbose = 0;
 
@@ -266,7 +300,19 @@ Eigen::VectorXi model_selection_no_optimization(
 //        postMode[deltaini[j]] = 1;
     }
 
-    modselIntegrals *integrals = new modselIntegrals(pimomMarginalKC, betabinPrior, p);
+
+    pt2margFun marfun;
+    pt2margFun priorfun;
+
+    if (prior_type == PriorType::modelbbprior) {
+        marfun = pimomMarginalKC;
+        priorfun = betabinPrior;
+    } else if (prior_type == PriorType::modelbinomprior) {
+        marfun = pimomMarginalKC;
+        priorfun = binomPrior;
+    }
+
+    modselIntegrals *integrals = new modselIntegrals(marfun, priorfun, p);
 
     firstingroup[0] = 0;
     for (int j = 1; j < n_groups; j++) {

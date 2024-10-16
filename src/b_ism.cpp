@@ -456,8 +456,9 @@ void b_ism(
         // ausm loop
         msPriorSpec priorCoef = imomprior_cpp(tau_g);
 
-        msPriorSpec priorDelta = modelbbprior_cpp(va, vb);
+//        msPriorSpec priorDelta = modelbbprior_cpp(va, vb);
 
+        msPriorSpec priorDelta = modelbinomprior_cpp(0.5);
 
 //        std::cout << "Z:" << std::endl << Z << std::endl << std::endl;
 //

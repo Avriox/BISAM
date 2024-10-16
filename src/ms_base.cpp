@@ -49,6 +49,14 @@ msPriorSpec modelbbprior_cpp(double alpha_p, double beta_p) {
     return msPriorSpec("modelIndicator", "binomial", priorPars);
 }
 
+msPriorSpec modelbinomprior_cpp(double p) {
+    std::map<std::string, double> priorPars = {
+            {"p", p}
+    };
+
+    return msPriorSpec("modelIndicator", "binomial", priorPars);
+}
+
 msPriorSpec igprior_cpp(double alpha, double lambda) {
     std::map<std::string, double> priorPars = {
             {"alpha",  alpha},
@@ -77,6 +85,11 @@ List imomprior(double tau, double tau_adj = 1e6) {
 // [[Rcpp::export]]
 List modelbbprior(double alpha_p = 1.0, double beta_p = 1.0) {
     return msPriorSpec_to_list(modelbbprior_cpp(alpha_p, beta_p));
+}
+
+// [[Rcpp::export]]
+List modelbinomprior(double p = 0.5) {
+    return msPriorSpec_to_list(modelbinomprior_cpp(p));
 }
 
 // [[Rcpp::export]]

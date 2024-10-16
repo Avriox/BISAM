@@ -163,6 +163,56 @@ double betabinPrior(int *sel, int *nsel, struct marginalPars *pars) {
     //return bbPrior(*nsel, *(*pars).p, (*pars).parprDeltap[0], (*pars).parprDeltap[1],1);
 }
 
+double vectBinom(int *sel, int *nsel, int len_prDeltap, int len_prConstrp, struct marginalPars *pars) {
+    int i, sel_i = 0, delta_i = 0, constr_i = 0, ngroups = *(*pars).ngroups, *groups = (*pars).groups, *nconstraints = (*pars).nconstraints, *nvaringroup = (*pars).nvaringroup;
+    double ans = 0, *prDeltap = (*pars).prDeltap, *prConstrp = (*pars).prConstrp;
+
+    if (*nsel == 0) {
+        for (i = 0; i < len_prDeltap; i++) ans += log(1 - prDeltap[(len_prDeltap > 1) ? i : 0]);
+        if (*(*pars).ngroupsconstr > 0) {
+            for (i = 0; i < len_prConstrp; i++) ans += log(1 - prConstrp[(len_prConstrp > 1) ? i : 0]);
+        }
+    } else {
+        for (i = 0; i < ngroups; i++) {
+            if (nconstraints[i] == 0) {
+                if (i == groups[sel[sel_i]]) {
+                    ans += log(prDeltap[delta_i]);
+                    if (sel_i < *nsel - 1) sel_i += nvaringroup[groups[i]];
+                } else {
+                    ans += log(1 - prDeltap[delta_i]);
+                }
+                if (len_prDeltap > 1) delta_i++;
+            } else {  // constrained, use prConstrp
+                if (i == groups[sel[sel_i]]) {
+                    ans += log(prConstrp[constr_i]);
+                    if (sel_i < *nsel - 1) sel_i += nvaringroup[groups[i]];
+                } else {
+                    ans += log(1 - prConstrp[constr_i]);
+                }
+                if (len_prConstrp > 1) constr_i++;
+            }
+        }
+    }
+    return ans;
+}
+
+double binomPrior(int *sel, int *nsel, struct marginalPars *pars) {
+    int ngroups0, ngroups1, n_notconstr, n_constr = *(*pars).ngroupsconstr,
+            len_prDeltap = (int) *(*pars).parprDeltap, len_prConstrp = (int) *(*pars).parprConstrp;
+    double ans, *prDeltap = (*pars).prDeltap, *prConstrp = (*pars).prConstrp;
+    nselConstraints(&ngroups0, &ngroups1, sel, nsel, (*pars).groups, (*pars).nconstraints, (*pars).nvaringroup);
+    n_notconstr = *(*pars).ngroups - n_constr;
+    if ((len_prDeltap == 1) & (len_prConstrp == 1)) {
+        ans = (ngroups0 + .0) * log(*prDeltap) + (n_notconstr - ngroups0 + .0) * log(1 - *prDeltap);
+        if ((n_constr) > 0) {
+            ans += (ngroups1 + .0) * log(*prConstrp) + (n_constr - ngroups1 + .0) * log(1 - *prConstrp);
+        }
+    } else {
+        ans = vectBinom(sel, nsel, len_prDeltap, len_prConstrp, pars);
+    }
+    return ans;
+    // return dbinomial(*nsel,*(*pars).p,*(*pars).prDeltap,1);
+}
 
 double f2opt_imom(double *th) {
     double ans;
@@ -414,3 +464,87 @@ double pimomMarginalKC(int *sel, int *nsel, struct marginalPars *pars) {
 //    free_dmatrix(cholVpropinv, 1, *nsel, 1, *nsel);
 //    return (ans);
 //}
+
+
+int mspriorCode(int *prCoef, int *prGroup, struct marginalPars *pars) {
+    // Returns a two-digit code indicating the prior on regression coefficients. The 1st digit is the prior on individual coef; The 2nd digit the prior on groups of coefficients
+    //  Input
+    //  - prCoef: 0 for pMOM; 1 for piMOM; 2 for peMOM; 3 for Zellner; 4 for normalid; 10 for group pMOM; 13 for group Zellner
+    //  - prGroup: 0 for pMOM; 1 for piMOM; 2 for peMOM; 3 for Zellner; 4 for normalid; 10 for group pMOM; 11 for group iMOM; 12 for group eMOM; 13 for group Zellner
+    //  Output
+    //    0: pMOM on all coef
+    //    1: peMOM on all coef
+    //    2: piMOM on all coef
+    //    3: Zellner on all coef
+    //    4: normalid on all coef
+    //    5: group pMOM (same as pMOM, standardized by n / X'X)
+    //    9: group Zellner on all coef
+    //   10: pMOM + group MOM
+    //   13: pMOM + group Zellner
+    //   32: peMOM + group eMOM
+    //   33: peMOM + group Zellner
+    //   43: Zellner + group Zellner
+    //   50: group MOM + group MOM
+    //   53: group MOM + group Zellner
+    //   63: group Zellner + group Zellner
+    //   73: normalid + group Zellner
+    //  100: BIC (no prior, tells marginal likelihood routines to return -0.5 BIC, the BIC approx to the marginal likelihood)
+    bool hasgroups = (*((*pars).ngroups)) < (*((*pars).p));
+    int ans;
+    if (*prCoef == 100) {
+        ans = 100;  // BIC
+    } else {
+        if (!hasgroups) {
+            if (*prCoef == 0) {  // pMOM on all coef
+                ans = 0;
+            } else if (*prCoef == 1) {  // piMOM on all coef
+                ans = 1;
+            } else if (*prCoef == 2) {  // peMOM on all coef
+                ans = 2;
+            } else if (*prCoef == 3) {  // Zellner on all coef
+                ans = 3;
+            } else if (*prCoef == 4) {  // normalid on all coef
+                ans = 4;
+            } else if (*prCoef == 10) {
+                ans = 5;                 // group pMOM
+            } else if (*prCoef == 13) {  // block Zellner on all coef
+                ans = 9;
+            } else {
+                Rf_error("Prior specified by priorCoef not currently implemented\n");
+            }
+        } else {
+            if ((*prCoef == 0) & (*prGroup == 0)) {  // pMOM on all coef
+                ans = 0;
+            } else if ((*prCoef == 1) & (*prGroup == 1)) {  // piMOM on all coef
+                ans = 1;
+            } else if ((*prCoef == 2) & (*prGroup == 2)) {  // peMOM on all coef
+                ans = 2;
+            } else if ((*prCoef == 3) & (*prGroup == 3)) {  // Zellner on all coef
+                ans = 3;
+            } else if ((*prCoef == 4) & (*prGroup == 4)) {  // normalid on all coef
+                ans = 4;
+            } else if ((*prCoef == 0) & (*prGroup == 10)) {  // pMOM + group MOM
+                ans = 10;
+            } else if ((*prCoef == 0) & (*prGroup == 13)) {  // pMOM + group Zellner
+                ans = 13;
+            } else if ((*prCoef == 2) & (*prGroup == 12)) {  // peMOM + group eMOM
+                ans = 32;
+            } else if ((*prCoef == 2) & (*prGroup == 13)) {  // peMOM + group Zellner
+                ans = 33;
+            } else if ((*prCoef == 3) & (*prGroup == 13)) {  // Zellner + group Zellner
+                ans = 43;
+            } else if ((*prCoef == 10) & (*prGroup == 10)) {  // group pMOM + group pMOM
+                ans = 50;
+            } else if ((*prCoef == 10) & (*prGroup == 13)) {  // group pMOM + group Zellner
+                ans = 53;
+            } else if ((*prCoef == 13) & (*prGroup == 13)) {  // group Zellner + group Zellner
+                ans = 63;
+            } else if ((*prCoef == 4) & (*prGroup == 13)) {  // normalid + group Zellner
+                ans = 73;
+            } else {
+                Rf_error("Prior specified by priorCoef and priorGroup not currently implemented\n");
+            }
+        }
+    }
+    return ans;
+}
