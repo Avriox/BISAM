@@ -611,6 +611,12 @@ if (split_x && (is.null(n_observations) || is.null(n_timeperiods))) {
   new("msfit",ans)
 }
 
+# JAKOB Added RNLP here again because it dit not show up for some reason
+rnlpCustom <- function(niter, burnin, thinning, y, x, tau, a_phi, b_phi, prior, thini, phiini){
+    rnlp_wrapper(niter, burnin, thinning, y, x, tau, a_phi, b_phi, prior, thini, phiini)
+}
+
+
 # format input data from either formula (y), formula and data.frame (y,data) or matrix and vector (y, x)
 # it accepts smoothterms, groups and survival data
 formatInputdata <- function(y,x,data,smoothterms,nknots,family) {
