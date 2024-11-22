@@ -1,7 +1,4 @@
-###
-### NAMESPACE
-###
-
+### ### NAMESPACE ###
 import(methods, mvtnorm, mgcv, ncvreg, stats)
 importFrom(dplyr, tibble)
 importFrom(glasso, glassopath)
@@ -14,12 +11,9 @@ importFrom(survival, Surv, coxph)
 importFrom("utils", "combn")
 importFrom(Rcpp, evalCpp)
 importFrom(pracma, pinv)
-
 importFrom("graphics", "lines")
 importFrom("grDevices", "devAskNewPage")
-
-useDynLib(mombf, .registration=TRUE)
-
+useDynLib(BISAM, .registration=TRUE)
 export(bbPrior)
 export(aic, bic, bicprior, ic)
 export(bestAIC, bestBIC, bestEBIC, bestIC)
@@ -71,5 +65,4 @@ export(unifPrior)
 export(zellnerprior,groupzellnerprior)
 export(normalidprior)
 export(cil)
-
 #exportClasses("msPriorSpec")
