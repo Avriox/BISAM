@@ -379,51 +379,8 @@ defaultmom= function(outcometype,family) {
     return(ans)
 }
 
-
-
-#### General model selection routines
-modelSelection <- function(y, x, data, smoothterms, nknots=9, groups=1:ncol(x), constraints, center=TRUE, scale=TRUE, enumerate, includevars=rep(FALSE,ncol(x)), models, maxvars, niter=5000, thinning=1, burnin=round(niter/10), family='normal', priorCoef, priorGroup, priorDelta=modelbbprior(1,1), priorConstraints, priorVar=igprior(.01,.01), priorSkew=momprior(tau=0.348), phi, deltaini=rep(FALSE,ncol(x)), initSearch='greedy', method='auto', adj.overdisp='intercept', hess='asymp', optimMethod, optim_maxit, initpar='none', B=10^5, XtXprecomp= ifelse(ncol(x)<10^4,TRUE,FALSE), verbose=TRUE, calc_thinit=FALSE, split_x=FALSE, n_timeperiods = NULL,n_observations  = NULL) {
-# Input
-# - y: either formula with the regression equation or vector with response variable. If a formula arguments x, groups & constraints are ignored
-# - x: design matrix with all potential predictors
-# - data: data frame where the variables indicated in y (if it's a formula) and smoothterms can be found
-# - smoothterms: formula indicating variables for which non-linear effects (splines) should be considered
-# - nknots: number of knots
-# - groups: vector indicating groups for columns in x (defaults to each variable in a separate group)
-# - constraints: constraints on the model space. List with length equal to the number of groups; if group[[i]]=c(j,k) then group i can only be in the model if groups j and k are also in the model
-# - center: if center==TRUE y and x are centered to have zero mean, therefore eliminating the need to include an intercept term in x.
-# - scale: if scale==TRUE y and columns in x are scaled to have standard deviation 1
-# - enumerate: if TRUE all models with up to maxvars are enumerated, else Gibbs sampling is used to explore the model space
-# - includevars: set to TRUE for variables that you want to force into the model (for grouped variables, TRUE/FALSE is taken from 1st variable in each group)
-# - maxvars: maximum number of variables in models to be enumerated (ignored if enumerate==FALSE)
-# - niter: number of Gibbs sampling iterations
-# - thinning: MCMC thinning factor, i.e. only one out of each thinning iterations are reported. Defaults to thinning=1, i.e. no thinning
-# - burnin: number of burn-in MCMC iterations. Defaults to 10% of niter. Set to 0 for no burn-in.
-# - family: assumed residual distribution ('normal','twopiecenormal','laplace','twopiecelaplace')
-# - priorCoef: prior distribution for the coefficients. Must be object of class 'msPriorSpec' with slot priorType set to 'coefficients'. Possible values for slot priorDistr are 'pMOM', 'piMOM' and 'peMOM'.
-# - priorGroup: prior on grouped coefficients, as indicated by groups
-# - priorDelta: prior on model indicator space. Must be object of class 'msPriorSpec' with slot priorType set to 'modelIndicator'. Possible values for slot priorDistr are 'uniform' and 'binomial'
-# - priorVar: prior on residual variance. Must be object of class 'msPriorSpec' with slot priorType set to 'nuisancePars'. Slot priorDistr must be equal to 'invgamma'.
-# - priorSkew: prior on residual skewness parameter. Ignored unless family=='twopiecenormal' or 'twopiecelaplace'
-# - phi: residual variance. Typically this is unknown and therefore left missing. If specified argument priorVar is ignored.
-# - deltaini: logical vector of length ncol(x) indicating which coefficients should be initialized to be non-zero. Defaults to all variables being excluded from the model
-# - initSearch: algorithm to refine deltaini. initSearch=='greedy' uses a greedy Gibbs sampling search. initSearch=='SCAD' sets deltaini to the non-zero elements in a SCAD fit with cross-validated regularization parameter. initSearch=='none' leaves deltaini unmodified.
-# - method: method to compute marginal densities. method=='Laplace' for Laplace approx, method=='MC' for Importance Sampling, method=='Hybrid' for Hybrid Laplace-IS (the latter method is only used for piMOM prior with unknown residual variance phi), method='ALA' (former method=='plugin')
-# - adj.overdisp: for method=='ALA' it indicates the over-dispersion adjustment to be made in models where the dispersion parameter is fixed, as in logistic and Poisson regression. adj.overdisp='none' for no adjustment (not recommended, particularly for Poisson models). adj.overdisp='intercept' to estimate over-dispersion from the intercept-only model. ad.overdisp='residuals' from the Pearson residuals of each model (slightly higher computational cost)
-# - hess: only used for asymmetric Laplace errors. When hess=='asymp' the asymptotic hessian is used to compute the Laplace approximation to the marginal likelihood, when hess=='asympDiagAdj' a diagonal adjustment to the asymptotic Hessian is used
-# - optimMethod: method to maximize objective function when method=='Laplace' or method=='MC'. Only used for family=='twopiecenormal'. optimMethod=='LMA' uses modified Newton-Raphson algorithm, 'CDA' coordinate descent algorithm
-# - optim_maxit: maximum number of iterations in optimization method
-# - initpar: initial value for regression parameters when finding the posterior mode to approximate the integrated likelihood. Either 'MLE', 'MLE-aisgd', 'L1', 'L2-aisgd', or a numeric vector specifying the initial values. If p<n/2 MLE is used, else L1 (regularization parameter set via BIC). If n>10,000 or p>200, then MLE-aisgd or L2-aisgd are used.
-# - B: number of samples to use in Importance Sampling scheme. Ignored if method=='Laplace'.
-# - verbose: set verbose==TRUE to print iteration progress
-# Output: list
-# - postSample: posterior samples
-# - margpp: marginal posterior probability for inclusion of each covariate (approx by averaging marginal post prob for inclusion in each Gibbs iteration. This approx is more accurate than simply taking colMeans(postSample))
-# - postMode: model with highest posterior probability amongst all those visited
-# - postModeProb: unnormalized posterior prob of posterior mode (log scale)
-# - postProb: unnormalized posterior prob of each visited model (log scale)
-
-  #Check input
+modelSelectionInternal <-function(y, x, data, smoothterms, nknots=9, groups=1:ncol(x), constraints, center=TRUE, scale=TRUE, enumerate, includevars=rep(FALSE,ncol(x)), models, maxvars, niter=5000, thinning=1, burnin=round(niter/10), family='normal', priorCoef, priorGroup, priorDelta=modelbbprior(1,1), priorConstraints, priorVar=igprior(.01,.01), priorSkew=momprior(tau=0.348), phi, deltaini=rep(FALSE,ncol(x)), initSearch='greedy', method='auto', adj.overdisp='intercept', hess='asymp', optimMethod, optim_maxit, initpar='none', B=10^5, XtXprecomp= ifelse(ncol(x)<10^4,TRUE,FALSE), verbose=TRUE, calc_thinit=FALSE, split_x=FALSE, n_timeperiods = NULL,n_observations  = NULL){
+#Check input
   tmp <- formatInputdata(y=y,x=x,data=data,smoothterms=smoothterms,nknots=nknots,family=family)
   x <- tmp$x; y <- tmp$y; formula <- tmp$formula;
   splineDegree <- tmp$splineDegree
@@ -514,13 +471,13 @@ if (split_x && (is.null(n_observations) || is.null(n_timeperiods))) {
   ffamily= formatFamily(family, issurvival= length(uncens)>0)
   familyint= ffamily$familyint; familygreedy= ffamily$familygreedy
   if (familyint == 22) { sumlogyfact= as.double(sum(lgamma(ystd+1))) } else { sumlogyfact= as.double(0) } #Poisson regression
-    
+
   if (!is.null(colnames(xstd))) { nn <- colnames(xstd) } else { nn <- paste('x',1:ncol(xstd),sep='') }
 
   tmp= formatmsPriorsMarg(priorCoef=priorCoef, priorGroup=priorGroup, priorVar=priorVar, priorSkew=priorSkew, n=n)
   r= tmp$r; prior= tmp$prior; priorgr= tmp$priorgr; tau=tmp$tau; taugroup=tmp$taugroup; alpha=tmp$alpha; lambda=tmp$lambda; taualpha=tmp$taualpha; fixatanhalpha=tmp$fixatanhalpha
   priorCoef= tmp$priorCoef; priorGroup= tmp$priorGroup
-    
+
   priorConstraints <- defaultpriorConstraints(priorDelta, priorConstraints)
   tmp= formatmsPriorsModel(priorDelta=priorDelta, priorConstraints=priorConstraints, constraints=constraints)
   prDelta=tmp$prDelta; prDeltap=tmp$prDeltap; parprDeltap=tmp$parprDeltap
@@ -609,9 +566,121 @@ if (split_x && (is.null(n_observations) || is.null(n_timeperiods))) {
   ans <- list(postSample=postSample,margpp=margpp,postMode=postMode,postModeProb=postModeProb,postProb=postProb,modelid=modelid,postmean=postmean,postvar=postvar,family=family,p=ncol(xstd),enumerate=enumerate,priors=priors,ystd=ystd,xstd=xstd,groups=groups,constraints=constraints,stdconstants=stdconstants,outcometype=outcometype,call=call)
   if (enumerate) { ans$models= models }
   new("msfit",ans)
+ }
+
+
+# Function to split matrix by columns into blocks
+split_matrix <- function(x, sub_rows, sub_cols) {
+  n <- ncol(x) / sub_cols  # number of blocks
+  result <- list()
+
+  for (i in 0:(sub_cols-1)) {
+    start_col <- i * (n+1)
+    end_col <- (i + 1) * n
+
+    # For rows: each block gets sub_rows rows, starting from where the last block ended
+    start_row <- if(i == 0) 1 else (i * sub_rows + 1)
+    end_row <- start_row + sub_rows - 1
+
+    block <- x[start_row:end_row, start_col:end_col, drop=FALSE]
+    result[[i + 1]] <- block
+  }
+
+  return(result)
+}
+
+# Function to split vector into blocks
+split_vector <- function(x, sub_size) {
+  n <- length(x) / sub_size
+  result <- list()
+
+  for (i in 0:(sub_size-1)) {
+    start <- i * n + 1
+    end <- (i + 1) * n
+    block <- x[start:end]
+    result[[i + 1]] <- block
+  }
+
+  return(result)
+}
+
+
+#### General model selection routines
+modelSelection <- function(y, x, data, smoothterms, nknots=9, groups=1:ncol(x), constraints, center=TRUE, scale=TRUE, enumerate, includevars=rep(FALSE,ncol(x)), models, maxvars, niter=5000, thinning=1, burnin=round(niter/10), family='normal', priorCoef, priorGroup, priorDelta=modelbbprior(1,1), priorConstraints, priorVar=igprior(.01,.01), priorSkew=momprior(tau=0.348), phi, deltaini=rep(FALSE,ncol(x)), initSearch='greedy', method='auto', adj.overdisp='intercept', hess='asymp', optimMethod, optim_maxit, initpar='none', B=10^5, XtXprecomp= ifelse(ncol(x)<10^4,TRUE,FALSE), verbose=TRUE, calc_thinit=FALSE, split_x=FALSE, n_timeperiods = NULL,n_observations  = NULL) {
+# Input
+# - y: either formula with the regression equation or vector with response variable. If a formula arguments x, groups & constraints are ignored
+# - x: design matrix with all potential predictors
+# - data: data frame where the variables indicated in y (if it's a formula) and smoothterms can be found
+# - smoothterms: formula indicating variables for which non-linear effects (splines) should be considered
+# - nknots: number of knots
+# - groups: vector indicating groups for columns in x (defaults to each variable in a separate group)
+# - constraints: constraints on the model space. List with length equal to the number of groups; if group[[i]]=c(j,k) then group i can only be in the model if groups j and k are also in the model
+# - center: if center==TRUE y and x are centered to have zero mean, therefore eliminating the need to include an intercept term in x.
+# - scale: if scale==TRUE y and columns in x are scaled to have standard deviation 1
+# - enumerate: if TRUE all models with up to maxvars are enumerated, else Gibbs sampling is used to explore the model space
+# - includevars: set to TRUE for variables that you want to force into the model (for grouped variables, TRUE/FALSE is taken from 1st variable in each group)
+# - maxvars: maximum number of variables in models to be enumerated (ignored if enumerate==FALSE)
+# - niter: number of Gibbs sampling iterations
+# - thinning: MCMC thinning factor, i.e. only one out of each thinning iterations are reported. Defaults to thinning=1, i.e. no thinning
+# - burnin: number of burn-in MCMC iterations. Defaults to 10% of niter. Set to 0 for no burn-in.
+# - family: assumed residual distribution ('normal','twopiecenormal','laplace','twopiecelaplace')
+# - priorCoef: prior distribution for the coefficients. Must be object of class 'msPriorSpec' with slot priorType set to 'coefficients'. Possible values for slot priorDistr are 'pMOM', 'piMOM' and 'peMOM'.
+# - priorGroup: prior on grouped coefficients, as indicated by groups
+# - priorDelta: prior on model indicator space. Must be object of class 'msPriorSpec' with slot priorType set to 'modelIndicator'. Possible values for slot priorDistr are 'uniform' and 'binomial'
+# - priorVar: prior on residual variance. Must be object of class 'msPriorSpec' with slot priorType set to 'nuisancePars'. Slot priorDistr must be equal to 'invgamma'.
+# - priorSkew: prior on residual skewness parameter. Ignored unless family=='twopiecenormal' or 'twopiecelaplace'
+# - phi: residual variance. Typically this is unknown and therefore left missing. If specified argument priorVar is ignored.
+# - deltaini: logical vector of length ncol(x) indicating which coefficients should be initialized to be non-zero. Defaults to all variables being excluded from the model
+# - initSearch: algorithm to refine deltaini. initSearch=='greedy' uses a greedy Gibbs sampling search. initSearch=='SCAD' sets deltaini to the non-zero elements in a SCAD fit with cross-validated regularization parameter. initSearch=='none' leaves deltaini unmodified.
+# - method: method to compute marginal densities. method=='Laplace' for Laplace approx, method=='MC' for Importance Sampling, method=='Hybrid' for Hybrid Laplace-IS (the latter method is only used for piMOM prior with unknown residual variance phi), method='ALA' (former method=='plugin')
+# - adj.overdisp: for method=='ALA' it indicates the over-dispersion adjustment to be made in models where the dispersion parameter is fixed, as in logistic and Poisson regression. adj.overdisp='none' for no adjustment (not recommended, particularly for Poisson models). adj.overdisp='intercept' to estimate over-dispersion from the intercept-only model. ad.overdisp='residuals' from the Pearson residuals of each model (slightly higher computational cost)
+# - hess: only used for asymmetric Laplace errors. When hess=='asymp' the asymptotic hessian is used to compute the Laplace approximation to the marginal likelihood, when hess=='asympDiagAdj' a diagonal adjustment to the asymptotic Hessian is used
+# - optimMethod: method to maximize objective function when method=='Laplace' or method=='MC'. Only used for family=='twopiecenormal'. optimMethod=='LMA' uses modified Newton-Raphson algorithm, 'CDA' coordinate descent algorithm
+# - optim_maxit: maximum number of iterations in optimization method
+# - initpar: initial value for regression parameters when finding the posterior mode to approximate the integrated likelihood. Either 'MLE', 'MLE-aisgd', 'L1', 'L2-aisgd', or a numeric vector specifying the initial values. If p<n/2 MLE is used, else L1 (regularization parameter set via BIC). If n>10,000 or p>200, then MLE-aisgd or L2-aisgd are used.
+# - B: number of samples to use in Importance Sampling scheme. Ignored if method=='Laplace'.
+# - verbose: set verbose==TRUE to print iteration progress
+# Output: list
+# - postSample: posterior samples
+# - margpp: marginal posterior probability for inclusion of each covariate (approx by averaging marginal post prob for inclusion in each Gibbs iteration. This approx is more accurate than simply taking colMeans(postSample))
+# - postMode: model with highest posterior probability amongst all those visited
+# - postModeProb: unnormalized posterior prob of posterior mode (log scale)
+# - postProb: unnormalized posterior prob of each visited model (log scale)
+
+if(split_x){
+
+
+       split_xs <- split_matrix(x, n_timeperiods, n_observations)
+       split_ys <- split_vector(y, n_observations)
+       split_wis <- split_vector(deltaini, n_observations)
+
+       post_samples <- logical(ncol(x))
+
+        for (j in seq_along(split_xs)) {
+              split_x_mat <- split_xs[[j]]
+              split_y <- split_ys[[j]]
+              split_wi <- split_wis[[j]]
+
+            post_sample = modelSelectionInternal(split_y, split_x_mat, data, smoothterms, nknots, 1:ncol(split_x_mat), constraints, center, scale, enumerate, rep(FALSE,ncol(split_x_mat)), models, maxvars, niter, thinning, burnin, family, priorCoef, priorGroup, priorDelta, priorConstraints, priorVar, priorSkew, phi, split_wi, initSearch, method, adj.overdisp, hess, optimMethod, optim_maxit, initpar, B, ifelse(ncol(split_x_mat)<10^4,TRUE,FALSE), verbose, calc_thinit, FALSE, n_timeperiods,n_observations)$postSample
+
+
+            res_len <- length(post_sample)
+                  start_idx <- (j-1) * res_len + 1
+                  end_idx <- j * res_len
+                  post_samples[start_idx:end_idx] <- as.logical(post_sample)
+
+        }
+
+    return(post_samples)
+
+} else {
+    return(modelSelectionInternal(y, x, data, smoothterms, nknots, groups, constraints, center, scale, enumerate, includevars, models, maxvars, niter, thinning, burnin, family, priorCoef, priorGroup, priorDelta, priorConstraints, priorVar, priorSkew, phi, deltaini, initSearch, method, adj.overdisp, hess, optimMethod, optim_maxit, initpar, B, XtXprecomp, verbose, calc_thinit, split_x, n_timeperiods,n_observations))
+}
+
 }
 
 # JAKOB Added RNLP here again because it dit not show up for some reason
+# TODO this is not being exported / used anymore!
 rnlpCustom <- function(niter, burnin, thinning, y, x, tau, a_phi, b_phi, prior, thini, phiini){
     rnlp_wrapper(niter, burnin, thinning, y, x, tau, a_phi, b_phi, prior, thini, phiini)
 }
