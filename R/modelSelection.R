@@ -570,7 +570,7 @@ if (split_x && (is.null(n_observations) || is.null(n_timeperiods))) {
 
 
 # Function to split matrix by columns into blocks
-function (x, sub_rows, sub_cols) 
+split_matrix <- function (x, sub_rows, sub_cols) 
 {
   n <- ncol(x)/sub_cols
   result <- list()
