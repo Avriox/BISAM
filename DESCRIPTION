@@ -1,0 +1,14 @@
+Package: BISAM
+Type: Package
+Title: Bayesian Indicator Saturation Model
+Version: 0.1.0
+Date: 2025-04-08
+Author: Jakob Goldmann, Lucas D. Konrad
+Maintainer: Jakob Goldmann <jakob.goldmann@s.wu.ac.at>
+Description: This package implements Bayesian Indicator Saturation Models for detecting structural breaks in time series data.
+License: GPL (>= 2)
+Imports: Rcpp (>= 1.0.0), RcppArmadillo
+LinkingTo: Rcpp, RcppArmadillo
+Depends: R (>= 3.5.0)
+RoxygenNote: 7.3.2
+SystemRequirements: OpenMP

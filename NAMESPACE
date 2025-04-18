@@ -1,0 +1,6 @@
+useDynLib(BISAM, .registration = TRUE)
+importFrom(Rcpp, evalCpp)
+export(estimate_model)
+export(STANDARD)
+export(SPLIT_SEQUENTIAL)
+export(SPLIT_PARALLEL)
