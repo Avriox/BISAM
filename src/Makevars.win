@@ -1,0 +1,14 @@
+# CXX_STD = CXX17
+
+# Force optimization flags to override R's defaults
+# PKG_CXXFLAGS = -O3 -march=native -mtune=native -funroll-loops -fomit-frame-pointer -DHAVE_OPENMP $(SHLIB_OPENMP_CXXFLAGS)
+
+# Link libraries
+# PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
+
+CXX_STD = CXX17
+PKG_CXXFLAGS = $(SHLIB_OPENMP_CXXFLAGS)
+PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
+
+# Parallel compilation
+MAKEFLAGS = -j16
